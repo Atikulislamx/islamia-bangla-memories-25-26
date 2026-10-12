@@ -1,71 +1,209 @@
+# ===========================================================================
+# Decap CMS configuration — Bengali Department memory archive
+# ===========================================================================
+# Admin panel:  https://atikulislamx.github.io/islamia-bangla-memories-25-26/admin/
+#
+# BACKEND — why turbo-github, and why `repo` is also set here
+# ---------------------------------------------------------------------------
+# The project previously failed with:
+#     The GitHub backend needs a "repo" in the backend configuration.
+#
+# Cause (verified, not assumed): the turbo-github backend extends the GitHub
+# backend and pulls `repo` from the Decap Turbo control plane for the site id
+# below. The public control-plane response for that site id currently returns
+#     {"supabase_app_id":"…","repo":null,"branch":"main",…}
+# i.e. no repository is connected on the Turbo site row, so the GitHub backend
+# receives no repo and refuses to start.
+#
+# Fix applied here: pin the site id AND declare the repository locally. Turbo
+# reads the deployment's own backend config after the control-plane values, and
+# only lets the control plane win for `repo` when it actually has a value — so
+# this local value is used while the Turbo site row has none, and is harmlessly
+# identical once the row is fixed in the dashboard.
+#
+# The dashboard-side step is still required for authentication and commits to
+# work end to end: connect the GitHub account in Turbo and set this repository
+# on the site row. See CMS_SETUP.md — authentication is NOT verified yet.
+# ===========================================================================
 backend:
   name: turbo-github
   turbo_site_id: "50710218-f620-46cd-8ee7-f56ff252e14d"
+  # Local fallback / source of truth for the repository on the site row.
+  repo: "Atikulislamx/islamia-bangla-memories-25-26"
   branch: main
 
+# Where the CMS lives and where the published site is
 site_url: "https://atikulislamx.github.io/islamia-bangla-memories-25-26"
 display_url: "https://atikulislamx.github.io/islamia-bangla-memories-25-26"
+logo_url: "https://atikulislamx.github.io/islamia-bangla-memories-25-26/assets/img/favicon.svg"
 
-locale: "bn"
+# Interface: English labels, with short Bengali hints on contributor-facing fields.
+locale: "en"
 
+# Editorial workflow is intentionally NOT enabled: Decap's editorial workflow
+# needs draft branches through the backend, which is unverified for turbo-github.
+# Until it is verified, publication is controlled by the `published` field
+# (Jekyll excludes `published: false` documents) plus the `sample` field, which
+# keeps placeholder entries visibly marked. See CMS_SETUP.md.
+publish_mode: simple
+
+# Media: files are committed to the repository, the public path includes the
+# GitHub Pages project baseurl so previews inside the CMS resolve correctly.
+# templates/_includes/image-url.html tolerates both forms in templates.
 media_folder: "assets/uploads"
 public_folder: "/islamia-bangla-memories-25-26/assets/uploads"
 
 collections:
-  - name: "events"
-    label: "ইভেন্ট ও অনুষ্ঠান"
-    folder: "_events"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    extension: "md"
-    format: "frontmatter"
-    fields:
-      - { label: "ইভেন্টের নাম", name: "title", widget: "string" }
-      - { label: "তারিখ", name: "date", widget: "datetime" }
-      - { label: "কভার ছবি", name: "cover", widget: "image", required: false }
-      - { label: "সংক্ষিপ্ত বিবরণ", name: "summary", widget: "text" }
-      - { label: "বিস্তারিত স্মৃতিচারণ", name: "body", widget: "markdown" }
-      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
-
+  # ---------------------------------------------------------------- memories
   - name: "memories"
-    label: "স্মৃতিচারণ"
+    label: "Memories"
+    label_singular: "Memory"
+    description: "Long-form recollections published at /memories/."
     folder: "_memories"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
+    summary: "{{title}} · {{date}}"
+    sortable_fields: ["date", "title"]
     fields:
-      - { label: "শিরোনাম", name: "title", widget: "string" }
-      - { label: "লেখক", name: "author", widget: "string" }
-      - { label: "স্মৃতিচারণ", name: "body", widget: "markdown" }
-      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+      - { label: "Title", name: "title", widget: "string", hint: "শিরোনাম — বাংলা বা ইংরেজি" }
+      - { label: "Date", name: "date", widget: "datetime", required: false, date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, hint: "ঐচ্ছিক। তারিখ জানা না থাকলে খালি রাখুন।" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        required: false
+        options: ["classroom", "campus", "literary", "friendship", "department", "reflection"]
+        hint: "Options must match _data/categories.yml."
+      - { label: "Author", name: "author", widget: "string", required: false, hint: "Needs the contributor's agreement. Leave empty to publish anonymously." }
+      - { label: "Language", name: "lang", widget: "select", options: ["en", "bn"], default: "en", hint: "Language the entry is written in." }
+      - { label: "Excerpt", name: "excerpt", widget: "text", required: false, hint: "Short summary for the archive grid." }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "Placeholder entry", name: "sample", widget: "boolean", default: false, required: false, hint: "Keep switched on for illustrative placeholders: it adds a visible “Sample content” badge." }
+      - { label: "Published", name: "published", widget: "boolean", default: true, required: false, hint: "Switched off = excluded from the built website. Note: the file is still visible in the public repository." }
+      - { label: "Related event", name: "related_event", widget: "string", required: false, hint: "Filename of an entry in _events (without .md)." }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Cover image", name: "image", widget: "image", required: false, media_folder: "/assets/uploads", public_folder: "/islamia-bangla-memories-25-26/assets/uploads" }
+      - { label: "Cover image description", name: "image_alt", widget: "string", required: false, hint: "Required for accessibility whenever an image is set." }
+      - { label: "Cover image caption", name: "caption", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown", hint: "Markdown is supported. For links use: [label]({{ site.baseurl }}/memories/)" }
 
+  # ------------------------------------------------------------------ events
+  - name: "events"
+    label: "Events"
+    label_singular: "Event"
+    description: "Programmes and gatherings, published at /events/."
+    folder: "_events"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    summary: "{{title}} · {{date}}"
+    sortable_fields: ["date", "title"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true, hint: "The Upcoming / Past label is calculated from this date." }
+      - { label: "Start time", name: "time", widget: "string", required: false }
+      - { label: "End date", name: "end_date", widget: "datetime", required: false, date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "Only publish a confirmed venue." }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        required: false
+        options: ["academic", "cultural", "departmental", "community"]
+      - { label: "Organised by", name: "organiser", widget: "string", required: false }
+      - { label: "Language", name: "lang", widget: "select", options: ["en", "bn"], default: "en" }
+      - { label: "Short description", name: "description", widget: "text", required: false }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "Placeholder entry", name: "sample", widget: "boolean", default: false, required: false }
+      - { label: "Published", name: "published", widget: "boolean", default: true, required: false }
+      - { label: "Cover image", name: "image", widget: "image", required: false, media_folder: "/assets/uploads", public_folder: "/islamia-bangla-memories-25-26/assets/uploads" }
+      - { label: "Cover image description", name: "image_alt", widget: "string", required: false }
+      - { label: "Cover image caption", name: "caption", widget: "string", required: false }
+      - label: "Photograph gallery"
+        name: "gallery"
+        widget: "list"
+        required: false
+        summary: "{{fields.caption}}"
+        fields:
+          - { label: "Image", name: "image", widget: "image", media_folder: "/assets/uploads", public_folder: "/islamia-bangla-memories-25-26/assets/uploads" }
+          - { label: "Image description", name: "alt", widget: "string" }
+          - { label: "Caption", name: "caption", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
+
+  # ------------------------------------------------------------------ quotes
   - name: "quotes"
-    label: "শিক্ষার্থীদের উক্তি"
+    label: "Quotes"
+    label_singular: "Quotation"
+    description: "Quotations shown on the quote wall at /quotes/."
     folder: "_quotes"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
+    summary: "{{author}} — {{quote}}"
     fields:
-      - { label: "উক্তি", name: "quote", widget: "text" }
-      - { label: "নাম", name: "author", widget: "string" }
-      - { label: "বিভাগ", name: "department", widget: "string", default: "বাংলা বিভাগ" }
-      - { label: "শিক্ষাবর্ষ", name: "batch", widget: "string", default: "২০২৫–২৬" }
-      - { label: "Facebook পোস্টের লিংক", name: "facebook_url", widget: "string", required: false }
-      - { label: "প্রকাশের অনুমতি নিশ্চিত", name: "permission_confirmed", widget: "boolean", default: false }
-      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+      - { label: "Quotation", name: "quote", widget: "text", hint: "Publish only public-domain texts, or contributions with recorded permission." }
+      - { label: "Author", name: "author", widget: "string", required: false }
+      - { label: "Source", name: "source", widget: "string", required: false, hint: "Title, year and where the line appears." }
+      - { label: "Language", name: "lang", widget: "select", options: ["en", "bn"], default: "en" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        required: false
+        options: ["public-domain", "matched-pair", "contributor"]
+      - { label: "English rendering", name: "translation", widget: "text", required: false, hint: "For Bengali quotations: say clearly that the rendering was prepared for this archive." }
+      - { label: "Rights note", name: "rights_note", widget: "text", required: false, hint: "Why this quotation may be published." }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false, required: false }
+      - { label: "Placeholder entry", name: "sample", widget: "boolean", default: false, required: false }
+      - { label: "Published", name: "published", widget: "boolean", default: true, required: false }
 
+  # ---------------------------------------------------------------- timeline
+  - name: "timeline"
+    label: "Our Journey"
+    label_singular: "Journey entry"
+    description: "Milestones shown on the timeline at /journey/."
+    folder: "_timeline"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    summary: "{{title}} · {{period}}"
+    sortable_fields: ["date", "title"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, picker_utc: true }
+      - { label: "Period label", name: "period", widget: "string", required: false, hint: "For example “March 2025 (approximate)”. Use it whenever the exact date is uncertain." }
+      - { label: "Location", name: "location", widget: "string", required: false }
+      - { label: "Language", name: "lang", widget: "select", options: ["en", "bn"], default: "en" }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - { label: "Image", name: "image", widget: "image", required: false, media_folder: "/assets/uploads", public_folder: "/islamia-bangla-memories-25-26/assets/uploads" }
+      - { label: "Image description", name: "image_alt", widget: "string", required: false }
+      - { label: "Image caption", name: "caption", widget: "string", required: false }
+      - { label: "Placeholder entry", name: "sample", widget: "boolean", default: false, required: false }
+      - { label: "Published", name: "published", widget: "boolean", default: true, required: false }
+
+  # ------------------------------------------------------------------ people
   - name: "people"
-    label: "আমাদের শিক্ষার্থীরা"
+    label: "Batch Members"
+    label_singular: "Member profile"
+    description: "Optional, consent-based profiles published at /people/."
     folder: "_people"
     create: true
     slug: "{{slug}}"
     extension: "md"
     format: "frontmatter"
+    summary: "{{name}} · {{role}}"
     fields:
-      - { label: "নাম", name: "name", widget: "string" }
-      - { label: "ছবি", name: "photo", widget: "image", required: false }
-      - { label: "পরিচিতি", name: "bio", widget: "text", required: false }
-      - { label: "প্রকাশের অনুমতি নিশ্চিত", name: "permission_confirmed", widget: "boolean", default: false }
-      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+      - { label: "Name shown in lists", name: "title", widget: "string" }
+      - { label: "Name", name: "name", widget: "string", hint: "Exactly the form of the name the member agreed to publish." }
+      - { label: "Role", name: "role", widget: "string", default: "Student, Department of Bengali" }
+      - { label: "Batch", name: "batch", widget: "string", default: "Honours Batch 2025–26" }
+      - { label: "Language", name: "lang", widget: "select", options: ["en", "bn"], default: "en" }
+      - { label: "Short biography", name: "bio", widget: "text", required: false, hint: "Written or reviewed by the member." }
+      - { label: "Photograph", name: "photo", widget: "image", required: false, media_folder: "/assets/uploads", public_folder: "/islamia-bangla-memories-25-26/assets/uploads" }
+      - { label: "Photograph description", name: "photo_alt", widget: "string", required: false }
+      - { label: "Consent confirmed", name: "permission_confirmed", widget: "boolean", default: false, required: false, hint: "Must be switched on before a real profile is displayed anywhere on the website. Record how and when consent was given in the body text." }
+      - { label: "Placeholder profile", name: "sample", widget: "boolean", default: false, required: false, hint: "Only for structural examples. Never for a real person's profile." }
+      - { label: "Published", name: "published", widget: "boolean", default: true, required: false }
+      - { label: "Notes / longer text", name: "body", widget: "markdown", required: false }

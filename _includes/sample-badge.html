@@ -1,0 +1,12 @@
+{%- comment -%}
+Visible marker for illustrative placeholder content. Rendered whenever an
+entry carries `sample: true` in its front matter, so a reader can never
+mistake a placeholder for a verified batch record.
+Usage: {% include sample-badge.html item=memory %}
+{%- endcomment -%}
+{%- if include.item.sample -%}
+<span class="badge badge--sample">
+  Sample content
+  <span class="u-visually-hidden"> — illustrative placeholder, not a verified batch record</span>
+</span>
+{%- endif -%}

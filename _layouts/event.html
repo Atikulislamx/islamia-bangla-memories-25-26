@@ -1,0 +1,111 @@
+---
+layout: default
+---
+{%- assign category_label = "" -%}
+{%- if page.category -%}
+  {%- assign category_match = site.data.categories.events | where: "id", page.category | first -%}
+  {%- assign category_label = category_match.label | default: page.category -%}
+{%- endif -%}
+{%- assign event_ts = page.date | date: "%s" | plus: 0 -%}
+{%- assign now_ts = site.time | date: "%s" | plus: 0 -%}
+{%- assign is_upcoming = false -%}
+{%- if event_ts > now_ts -%}{%- assign is_upcoming = true -%}{%- endif -%}
+{%- assign related_memories = site.memories | where: "related_event", page.slug -%}
+
+<article class="entry entry--event">
+  <div class="container container--reading">
+    {% include breadcrumbs.html parent_title="Events" parent_url="/events/" %}
+
+    <header class="entry__header">
+      <p class="entry__meta">
+        <span class="badge badge--status{% if is_upcoming %} badge--upcoming{% endif %}">{% if is_upcoming %}Upcoming{% else %}Past{% endif %}</span>
+        {%- if category_label != "" %}<span class="entry__category">{{ category_label }}</span>{% endif -%}
+        {% include sample-badge.html item=page %}
+      </p>
+      <h1 class="entry__title"{% if page.lang == 'bn' %} lang="bn"{% endif %}>{{ page.title }}</h1>
+      {%- if page.description %}<p class="entry__subtitle">{{ page.description | strip_newlines | strip }}</p>{%- endif %}
+    </header>
+
+    <dl class="event-facts">
+      <div class="event-facts__item">
+        <dt>Date</dt>
+        <dd>{% if page.date %}<time datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: "%-d %B %Y" }}</time>{% else %}Not recorded{% endif %}
+          {%- if page.end_date %} – <time datetime="{{ page.end_date | date: '%Y-%m-%d' }}">{{ page.end_date | date: "%-d %B %Y" }}</time>{% endif %}</dd>
+      </div>
+      {%- if page.time %}
+      <div class="event-facts__item">
+        <dt>Time</dt>
+        <dd>{{ page.time }}</dd>
+      </div>
+      {%- endif %}
+      {%- if page.location %}
+      <div class="event-facts__item">
+        <dt>Location</dt>
+        <dd>{{ page.location }}</dd>
+      </div>
+      {%- endif %}
+      {%- if page.organiser %}
+      <div class="event-facts__item">
+        <dt>Organised by</dt>
+        <dd>{{ page.organiser }}</dd>
+      </div>
+      {%- endif %}
+    </dl>
+  </div>
+
+  {%- if page.image %}
+  <div class="container container--wide">
+    {% include figure.html image=page.image alt=page.image_alt caption=page.caption lang=page.lang extra_class="entry__figure" loading="eager" ratio="16 / 9" %}
+  </div>
+  {%- endif %}
+
+  <div class="container container--reading">
+    <div class="prose prose--entry"{% if page.lang %} lang="{{ page.lang }}"{% endif %}>
+      {{ content }}
+    </div>
+
+    {%- if page.gallery and page.gallery.size > 0 %}
+    <section class="event-gallery" aria-labelledby="event-gallery-title">
+      <h2 class="section-title" id="event-gallery-title">Photographs from this event</h2>
+      <ul class="gallery gallery--compact" data-gallery>
+        {%- for shot in page.gallery %}
+        {%- capture shot_src %}{% include image-url.html path=shot.image %}{% endcapture -%}
+        <li class="gallery__item">
+          <figure class="gallery__figure">
+            <a class="gallery__link" href="{{ shot_src | strip }}" data-lightbox
+               data-lightbox-src="{{ shot_src | strip }}"
+               data-lightbox-caption="{{ shot.caption | default: shot.alt | escape }}"
+               data-lightbox-alt="{{ shot.alt | escape }}"
+               aria-label="View larger image: {{ shot.caption | default: shot.alt | escape }}">
+              <img class="gallery__image" src="{{ shot_src | strip }}" alt="{{ shot.alt | escape }}" loading="lazy" decoding="async">
+            </a>
+            {%- if shot.caption %}<figcaption class="gallery__caption"><span class="gallery__caption-text"{% if shot.lang %} lang="{{ shot.lang }}"{% endif %}>{{ shot.caption }}</span></figcaption>{% endif %}
+          </figure>
+        </li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+
+    {%- if related_memories.size > 0 %}
+    <section class="related-section" aria-labelledby="related-memories-title">
+      <h2 class="related-section__title" id="related-memories-title">Related memories</h2>
+      <ul class="related-list">
+        {%- for memory in related_memories %}
+        <li class="related-list__item">
+          <a href="{{ memory.url | relative_url }}"{% if memory.lang == 'bn' %} lang="bn"{% endif %}>{{ memory.title }}</a>
+          {%- if memory.date %} <time datetime="{{ memory.date | date: '%Y-%m-%d' }}">{{ memory.date | date: "%-d %B %Y" }}</time>{% endif %}
+        </li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+
+    <p class="entry__return">
+      <a class="button button--ghost" href="{{ '/events/' | relative_url }}">Back to Events</a>
+      <a class="button button--quiet" href="{{ '/' | relative_url }}">Back to Home</a>
+    </p>
+  </div>
+</article>
+
+{% include lightbox.html %}

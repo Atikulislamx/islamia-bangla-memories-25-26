@@ -1,0 +1,276 @@
+---
+layout: default
+---
+{%- assign featured_memories = site.memories | where: "featured", true | sort: "date" | reverse -%}
+{%- if featured_memories.size == 0 -%}
+  {%- assign featured_memories = site.memories | sort: "date" | reverse | slice: 0, 3 -%}
+{%- endif -%}
+{%- assign featured_quotes = site.quotes | where: "featured", true -%}
+{%- if featured_quotes.size == 0 -%}
+  {%- assign featured_quotes = site.quotes | slice: 0, 2 -%}
+{%- endif -%}
+{%- assign journey_preview = site.timeline | sort: "date" | slice: 0, 3 -%}
+{%- assign now_ts = site.time | date: "%s" | plus: 0 -%}
+{%- assign upcoming_count = 0 -%}
+{%- for event in site.events -%}
+  {%- assign event_ts = event.date | date: "%s" | plus: 0 -%}
+  {%- if event_ts > now_ts -%}{%- assign upcoming_count = upcoming_count | plus: 1 -%}{%- endif -%}
+{%- endfor -%}
+{%- comment -%}
+Only profiles with recorded consent (or clearly-labelled structural samples)
+are ever listed. Counted with a counter so the template stays portable.
+{%- endcomment -%}
+{%- assign listed_people_count = 0 -%}
+{%- for person in site.people -%}
+  {%- if person.permission_confirmed or person.sample -%}
+    {%- assign listed_people_count = listed_people_count | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<!-- ============================ Hero ============================ -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__content">
+      <p class="hero__eyebrow">
+        <span class="hero__eyebrow-place">{{ site.institution.name }}</span>
+        <span aria-hidden="true">·</span>
+        <span>{{ site.institution.location }}</span>
+      </p>
+      <p class="hero__bn" lang="bn">{{ site.institution.department_bn }} <span aria-hidden="true">·</span> {{ site.institution.batch_bn }}</p>
+      <h1 class="hero__title" id="hero-title">
+        <span class="hero__title-line">An archive of</span>
+        <span class="hero__title-line hero__title-line--accent">Bengali memories</span>
+      </h1>
+      <p class="hero__tagline">{{ site.tagline }}</p>
+      <p class="hero__lede">
+        A student-built digital yearbook for the Department of Bengali, Honours
+        Batch 2025–26. Memories, events, quotations and photographs are gathered
+        here so that the everyday life of one batch stays readable long after
+        the final class.
+      </p>
+      <p class="hero__actions">
+        <a class="button button--primary" href="{{ '/memories/' | relative_url }}">Explore Memories</a>
+        <a class="button button--ghost" href="{{ '/journey/' | relative_url }}">Our Journey</a>
+      </p>
+      <p class="hero__meta">
+        <span class="hero__meta-item">{{ site.institution.batch }}</span>
+        <span class="hero__meta-item">{{ site.institution.department }}</span>
+        {%- if site.sample_content %}<span class="hero__meta-item hero__meta-item--flag">Sample content included</span>{% endif %}
+      </p>
+    </div>
+
+    <div class="hero__media">
+      {% include figure.html image="/assets/img/hero-archive.jpg" alt="Placeholder artwork: abstract ink-wash composition in deep green and warm amber, inspired by Bengali manuscript margins." caption="Placeholder artwork — to be replaced with an authorised photograph of the department or the batch." extra_class="hero__figure" loading="eager" ratio="4 / 5" %}
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  {%- if site.sample_content %}
+  {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+  {%- endif %}
+  {% include notice.html variant="info" title="About this website" body=site.disclaimer %}
+</div>
+
+<!-- ======================= Archive at a glance ======================= -->
+<section class="section section--stats" aria-labelledby="stats-title">
+  <div class="container">
+    <h2 class="section-title section-title--quiet" id="stats-title">Archive at a glance</h2>
+    <ul class="stat-list">
+      <li class="stat"><span class="stat__value">{{ site.memories.size }}</span><span class="stat__label">Memories</span></li>
+      <li class="stat"><span class="stat__value">{{ site.events.size }}</span><span class="stat__label">Events recorded</span></li>
+      <li class="stat"><span class="stat__value">{{ upcoming_count }}</span><span class="stat__label">Upcoming events</span></li>
+      <li class="stat"><span class="stat__value">{{ site.quotes.size }}</span><span class="stat__label">Quotations</span></li>
+      <li class="stat"><span class="stat__value">{{ site.timeline.size }}</span><span class="stat__label">Journey entries</span></li>
+      <li class="stat"><span class="stat__value">{{ listed_people_count }}</span><span class="stat__label">Member profiles</span></li>
+    </ul>
+    <p class="stat-list__note">
+      Counts are generated from the published entries in this repository. Entries
+      marked “Sample content” are placeholders, so the numbers will change as
+      verified batch material replaces them.
+    </p>
+  </div>
+</section>
+
+<!-- ========================= Featured memories ========================= -->
+<section class="section" aria-labelledby="featured-memories-title">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-header__eyebrow">Memories</p>
+        <h2 class="section-title" id="featured-memories-title">Featured memories</h2>
+        <p class="section-header__lede">Moments contributed by the batch — classroom days, campus hours and personal reflections.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/memories/' | relative_url }}">View All</a></p>
+    </div>
+    {%- if featured_memories.size > 0 %}
+    <ul class="card-grid card-grid--memories">
+      {%- for memory in featured_memories limit: 3 %}
+      <li class="card-grid__item">{% include memory-card.html item=memory %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    {% include empty-state.html title="No memories published yet" body="The archive is ready for the first contributions. Once a memory is approved it appears here, with its own page." url="/contribute/" url_text="Contribute a Memory" %}
+    {%- endif %}
+  </div>
+</section>
+
+<!-- =========================== Our Journey =========================== -->
+<section class="section section--tinted" aria-labelledby="journey-preview-title">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-header__eyebrow">Our Journey</p>
+        <h2 class="section-title" id="journey-preview-title">A batch timeline</h2>
+        <p class="section-header__lede">Milestones are added only when they are verified. Until then, the timeline stays deliberately short.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/journey/' | relative_url }}">Explore Memories</a></p>
+    </div>
+    {%- if journey_preview.size > 0 %}
+    <ol class="timeline timeline--preview">
+      {%- for entry in journey_preview %}
+      {% include timeline-entry.html item=entry %}
+      {%- endfor %}
+    </ol>
+    {%- else %}
+    {% include empty-state.html title="The timeline is waiting for verified milestones" body="Entries are added only from confirmed batch information, so nothing has been invented to fill the space." url="/about/" url_text="How the archive works" %}
+    {%- endif %}
+  </div>
+</section>
+
+<!-- ========================== Selected events ========================== -->
+<section class="section" aria-labelledby="events-preview-title">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-header__eyebrow">Events</p>
+        <h2 class="section-title" id="events-preview-title">Selected events</h2>
+        <p class="section-header__lede">Programmes, seminars and gatherings recorded by the batch.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/events/' | relative_url }}">View All</a></p>
+    </div>
+    {%- assign past_event_count = site.events.size | minus: upcoming_count -%}
+    {%- if upcoming_count > 0 %}
+    <h3 class="subsection-title">Upcoming Events</h3>
+    {% include event-list.html scope="upcoming" limit=2 %}
+    {%- endif %}
+    {%- if past_event_count > 0 %}
+    <h3 class="subsection-title">{% if upcoming_count > 0 %}Past Events{% else %}Recent events{% endif %}</h3>
+    {% include event-list.html scope="past" limit=2 %}
+    {%- endif %}
+    {%- if site.events.size == 0 %}
+    {% include empty-state.html title="No events published yet" body="Verified events appear here with their own page, including date, location and photographs where permission allows." url="/contribute/" url_text="Suggest an event" %}
+    {%- endif %}
+  </div>
+</section>
+
+<!-- ============================ Quotations ============================ -->
+<section class="section section--ink" aria-labelledby="quotes-preview-title">
+  <div class="container">
+    <div class="section-header section-header--light">
+      <div>
+        <p class="section-header__eyebrow">Quotes</p>
+        <h2 class="section-title" id="quotes-preview-title">Words that stay</h2>
+        <p class="section-header__lede">Public-domain literary quotations and reflections shared by the batch.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/quotes/' | relative_url }}">Read More</a></p>
+    </div>
+    {%- if featured_quotes.size > 0 %}
+    <div class="quote-wall quote-wall--preview">
+      {%- for quote in featured_quotes limit: 2 %}
+      {% include quote-card.html item=quote %}
+      {%- endfor %}
+    </div>
+    {%- else %}
+    {% include empty-state.html title="No quotations published yet" body="Only public-domain texts or contributions with recorded permission are published here." url="/contribute/" url_text="Suggest a quotation" %}
+    {%- endif %}
+  </div>
+</section>
+
+<!-- =========================== Photo gallery =========================== -->
+<section class="section" aria-labelledby="gallery-preview-title">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-header__eyebrow">Photo Gallery</p>
+        <h2 class="section-title" id="gallery-preview-title">From the gallery</h2>
+        <p class="section-header__lede">Photographs are published only with consent from everyone identifiable in them.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/gallery/' | relative_url }}">View All</a></p>
+    </div>
+    {% if site.data.gallery.items.size > 0 %}
+    {% include gallery-grid.html limit=4 %}
+    {%- else %}
+    {% include empty-state.html title="No photographs published yet" body="Gallery entries are added once photographs and consent records are supplied." url="/contribute/" url_text="Contribute a photograph" %}
+    {%- endif %}
+  </div>
+</section>
+
+<!-- =========================== Batch members =========================== -->
+{%- if listed_people_count > 0 %}
+<section class="section section--tinted" aria-labelledby="people-preview-title">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-header__eyebrow">Batch Members</p>
+        <h2 class="section-title" id="people-preview-title">Member profiles</h2>
+        <p class="section-header__lede">Optional profiles, published only when the member has confirmed how their name and photograph may be used.</p>
+      </div>
+      <p class="section-header__action"><a class="button button--ghost" href="{{ '/people/' | relative_url }}">View All</a></p>
+    </div>
+    <ul class="card-grid card-grid--people">
+      {%- assign listed_shown = 0 -%}
+      {%- for person in site.people -%}
+        {%- if listed_shown < 3 -%}
+          {%- assign is_listable = false -%}
+          {%- if person.permission_confirmed -%}{%- assign is_listable = true -%}{%- endif -%}
+          {%- if person.sample -%}{%- assign is_listable = true -%}{%- endif -%}
+          {%- if is_listable -%}
+            {%- assign listed_shown = listed_shown | plus: 1 -%}
+            <li class="card-grid__item">{% include person-card.html item=person %}</li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+{%- endif %}
+
+<!-- ============================ About panel ============================ -->
+<section class="section" aria-labelledby="about-panel-title">
+  <div class="container about-panel">
+    <div class="about-panel__text">
+      <p class="section-header__eyebrow">About Us</p>
+      <h2 class="section-title" id="about-panel-title">Why this archive exists</h2>
+      <p>
+        The Department of Bengali at Islamia Government College has carried the
+        language of <span lang="bn">বাংলা</span> through generations of students.
+        This archive keeps one batch's experience in that long line: how the
+        classes felt, what was read, who was met, what was said.
+      </p>
+      <p>
+        It is a student project, maintained from a public repository, and it is
+        not the official website of the college. Every contribution is reviewed
+        for accuracy and consent before it is published.
+      </p>
+      <p class="about-panel__actions">
+        <a class="button button--primary" href="{{ '/about/' | relative_url }}">Read the About page</a>
+        <a class="button button--ghost" href="{{ '/search/' | relative_url }}">Search</a>
+      </p>
+    </div>
+    <div class="about-panel__list">
+      <h3 class="subheading">What the archive keeps</h3>
+      <ul class="tick-list">
+        <li>Everyday memories, in English or Bengali</li>
+        <li>Events with dates, locations and photographs</li>
+        <li>Public-domain quotations and personal reflections</li>
+        <li>Consent-cleared photographs with accessible descriptions</li>
+        <li>A chronological timeline of verified milestones</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+{{ content }}
+
+{% include lightbox.html %}

@@ -1,0 +1,43 @@
+---
+layout: archive
+title: "Photo Gallery"
+eyebrow: "Photographs"
+lede: >-
+  Photographs from the batch, published with consent from everyone identifiable
+  in them. Every image carries a text description so that the gallery works for
+  screen readers and on slow connections.
+archive_note: >-
+  Images currently shown are abstract placeholder artwork supplied with the
+  project, not photographs of the college, the department or any individual.
+permalink: /gallery/
+description: >-
+  Photo gallery of the Department of Bengali, Honours Batch 2025–26 —
+  consent-cleared photographs with captions and accessible descriptions.
+search_include: true
+---
+{%- assign gallery_items = site.data.gallery.items -%}
+
+<section class="section" aria-labelledby="gallery-title">
+  <div class="container">
+    {% include notice.html variant="sample" title="Placeholder artwork notice" body=site.data.gallery.notice %}
+
+    <h2 class="section-title section-title--quiet" id="gallery-title">
+      {%- if gallery_items.size > 0 -%}
+        {{ gallery_items.size }} {% if gallery_items.size == 1 %}image{% else %}images{% endif %} published
+      {%- else -%}
+        Photo gallery
+      {%- endif -%}
+    </h2>
+
+    {%- if gallery_items.size > 0 %}
+    {% include gallery-grid.html %}
+    <p class="filters__status">Select any image to open it larger. Use the arrow keys to move between images and Escape to close the viewer.</p>
+    {%- else %}
+    {% include empty-state.html title="No photographs published yet" body="Gallery entries are added once photographs and consent records are supplied. Photographs of identifiable students are published only with permission." url="/contribute/" url_text="Contribute a photograph" %}
+    {%- endif %}
+
+    {% include notice.html variant="info" title="Consent and captions" body="A photograph is published only when everyone identifiable in it has agreed, when the caption is accurate, and when the contributor has the right to share the image. Removal requests are handled as described in the Privacy Policy." url="/privacy/" url_text="Read the Privacy Policy" %}
+  </div>
+</section>
+
+{% include lightbox.html %}

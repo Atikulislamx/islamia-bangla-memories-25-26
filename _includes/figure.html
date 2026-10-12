@@ -1,0 +1,28 @@
+{%- comment -%}
+Renders an editorial figure with an optional caption.
+
+Parameters (all optional except `image`):
+  image       — path or URL
+  alt         — accessible description (required for meaningful images; pass
+                an empty string for purely decorative images)
+  caption     — visible caption text
+  lang        — language of the caption ("en" is the default)
+  extra_class — extra class names for the figure element
+  loading     — "lazy" (default) or "eager"
+  ratio       — CSS aspect-ratio value, e.g. "4 / 3" (default) or "16 / 9"
+{%- endcomment -%}
+{%- if include.image -%}
+<figure class="figure{% if include.extra_class %} {{ include.extra_class }}{% endif %}">
+  <div class="figure__frame" style="--figure-ratio: {{ include.ratio | default: '4 / 3' }};">
+    <img
+      src="{% include image-url.html path=include.image %}"
+      alt="{{ include.alt | default: '' | escape }}"
+      loading="{{ include.loading | default: 'lazy' }}"
+      decoding="async"
+      class="figure__image">
+  </div>
+  {%- if include.caption -%}
+  <figcaption class="figure__caption"{% if include.lang %} lang="{{ include.lang }}"{% endif %}>{{ include.caption }}</figcaption>
+  {%- endif -%}
+</figure>
+{%- endif -%}

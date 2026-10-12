@@ -1,0 +1,71 @@
+---
+layout: archive
+title: "Quotes"
+eyebrow: "Archive"
+lede: >-
+  A wall of quotations and reflections. Bengali and English sit side by side,
+  each with the attribution the archive can actually verify.
+archive_note: >-
+  Published quotations are either in the public domain or shared by their author
+  with recorded permission. Quotations are never attributed to a writer, a
+  teacher or a student on the strength of memory alone.
+permalink: /quotes/
+description: >-
+  Literary quotations and contributor reflections collected by the Department of
+  Bengali, Honours Batch 2025–26 — public-domain texts and consented
+  reflections.
+search_include: true
+---
+{%- assign ordered_quotes = site.quotes | sort: "date" | reverse -%}
+{%- assign public_domain = ordered_quotes | where: "category", "public-domain" -%}
+{%- assign matched_pair = ordered_quotes | where: "category", "matched-pair" -%}
+{%- assign contributor_quotes = ordered_quotes | where: "category", "contributor" -%}
+
+<section class="section" aria-labelledby="quotes-wall-title">
+  <div class="container">
+    {%- if site.sample_content %}
+    {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+    {%- endif %}
+
+    <h2 class="section-title section-title--quiet" id="quotes-wall-title">
+      {%- if ordered_quotes.size > 0 -%}
+        {{ ordered_quotes.size }} {% if ordered_quotes.size == 1 %}quotation{% else %}quotations{% endif %} on the wall
+      {%- else -%}
+        Quote wall
+      {%- endif -%}
+    </h2>
+
+    {% include archive-filters.html group="quotes" languages=true legend="Filter quotations" %}
+
+    {%- if ordered_quotes.size > 0 %}
+    <div class="quote-wall">
+      {%- for quote in ordered_quotes %}
+      {% include quote-card.html item=quote %}
+      {%- endfor %}
+    </div>
+    <div class="empty-state" data-filter-empty hidden>
+      <p class="empty-state__title">No quotations match these filters</p>
+      <p class="empty-state__body">Try “View All”, or choose a different category or language.</p>
+    </div>
+    {%- else %}
+    {% include empty-state.html title="No quotations published yet" body="Only public-domain texts or contributions with recorded permission are published on this wall." url="/contribute/" url_text="Suggest a quotation" %}
+    {%- endif %}
+
+    {%- if public_domain.size > 0 or matched_pair.size > 0 or contributor_quotes.size > 0 %}
+    <div class="cta-panel">
+      <h2 class="cta-panel__title">How this wall is built</h2>
+      <p class="cta-panel__body">
+        Most quotations here come from works that are in the public domain, and
+        each one names its source. Reflections contributed by batch members are
+        published only with the author's permission and are labelled as
+        contributor reflections. If a quotation cannot be traced to a published
+        source, it is left out rather than guessed at.
+      </p>
+      <p class="cta-panel__action">
+        <a class="button button--ghost" href="{{ '/contribute/' | relative_url }}">Suggest a quotation</a>
+        <a class="button button--ghost" href="{{ '/privacy/' | relative_url }}">Privacy Policy</a>
+      </p>
+    </div>
+    {%- endif %}
+  </div>
+</section>

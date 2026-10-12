@@ -1,0 +1,151 @@
+# ===========================================================================
+# Islamia Government College | Department of Bengali
+# Digital Memory Archive — Honours Batch 2025–26
+# ---------------------------------------------------------------------------
+# Static Jekyll site built for GitHub Pages (legacy build, no custom plugins).
+# Every internal link, asset path and canonical URL is baseurl-aware, because
+# the site is published from a project repository, not from a domain root.
+# ===========================================================================
+
+# --- Identity ---------------------------------------------------------------
+title: "Islamia Government College | Department of Bengali"
+short_title: "Bengali Department Memories"
+tagline: "Our Stories. Our Memories. Our Bengali Department."
+supporting_tagline: "One Batch. Countless Stories. Memories That Stay."
+description: >-
+  A student-built digital memory archive and yearbook for the Department of
+  Bengali, Honours Batch 2025–26, Islamia Government College, Sirajganj,
+  Bangladesh. Memories, events, quotations, photographs and milestones —
+  preserved in English and Bengali.
+title_separator: "·"
+lang: "en"
+locale: "en_US"
+
+# --- URLs -------------------------------------------------------------------
+# Site URL = the published root; baseurl = the project folder on GitHub Pages.
+url: "https://atikulislamx.github.io"
+baseurl: "/islamia-bangla-memories-25-26"
+
+# --- Repository -------------------------------------------------------------
+repository: "Atikulislamx/islamia-bangla-memories-25-26"
+github_repo_url: "https://github.com/Atikulislamx/islamia-bangla-memories-25-26"
+
+# --- Developer credit (single source of truth) ------------------------------
+# Rendered by _includes/footer.html on every public page and on every
+# collection-generated detail page. Do not duplicate this text elsewhere.
+developer:
+  name: "Atikul Islam Rabbi"
+  role: "Student, Department of Bengali"
+  credit_line: "Designed &amp; Developed by Atikul Islam Rabbi"
+  credit_line_plain: "Designed & Developed by Atikul Islam Rabbi"
+  github_username: "Atikulislamx"
+  github_url: "https://github.com/Atikulislamx"
+
+# --- Institution ------------------------------------------------------------
+institution:
+  name: "Islamia Government College"
+  department: "Department of Bengali"
+  department_bn: "বাংলা বিভাগ"
+  batch: "Honours Batch 2025–26"
+  batch_bn: "সম্মান ২০২৫–২৬"
+  location: "Sirajganj, Bangladesh"
+
+# --- Editorial notice -------------------------------------------------------
+# The published archive currently contains clearly labelled placeholder
+# entries so that every layout can be reviewed. Set to false once the batch
+# content replaces the samples (see CONTENT_GUIDE.md).
+sample_content: true
+sample_notice: >-
+  Entries marked “Sample content” are illustrative placeholders used to
+  demonstrate the layouts. They are not real batch records and can be replaced
+  or deleted at any time — see CONTENT_GUIDE.md.
+
+# This website is a student project and is not the official college website.
+disclaimer: >-
+  This is a student-created digital memory archive. It is not the official
+  website of Islamia Government College and does not claim institutional
+  endorsement.
+
+# --- Sharing -----------------------------------------------------------------
+social_image: "/assets/img/og-memories.jpg"
+social_image_alt: >-
+  Abstract editorial artwork used as the default social sharing image for the
+  Bengali Department digital memory archive.
+
+# --- Build behaviour --------------------------------------------------------
+future: true          # upcoming events are planned, not published elsewhere
+timezone: Asia/Dhaka
+encoding: utf-8
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: none
+
+# The public website intentionally uses no Jekyll plugins: SEO metadata,
+# sitemap and robots.txt are generated from include files instead, so the
+# build works on the standard GitHub Pages environment without a Gemfile.
+plugins: []
+
+# --- Collections ------------------------------------------------------------
+# output: true  -> the collection also generates its own detail pages
+# output: false -> the collection is rendered only inside archive pages
+collections:
+  memories:
+    output: true
+    permalink: /memories/:slug/
+  events:
+    output: true
+    permalink: /events/:slug/
+  timeline:
+    output: false
+  quotes:
+    output: false
+  people:
+    output: true
+    permalink: /people/:slug/
+
+# --- Defaults ---------------------------------------------------------------
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+      type: "memories"
+    values:
+      layout: "memory"
+  - scope:
+      path: ""
+      type: "events"
+    values:
+      layout: "event"
+  - scope:
+      path: ""
+      type: "people"
+    values:
+      layout: "person"
+
+# --- Files kept out of the published site -----------------------------------
+# Documentation lives in the repository for maintainers; it is not part of the
+# deployed website. The admin/ folder IS published on purpose: Decap CMS loads
+# admin/config.yml from the deployed site.
+exclude:
+  - README.md
+  - DEPLOYMENT.md
+  - CMS_SETUP.md
+  - CONTENT_GUIDE.md
+  - PRIVACY_AND_CONSENT.md
+  - CHANGELOG.md
+  - QA_REPORT.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .github
+  - .gitignore

@@ -1,0 +1,19 @@
+{%- comment -%}
+Editorial notice block.
+
+Parameters:
+  variant  — "sample" (default), "info" or "warning"
+  title    — heading text
+  body     — supporting text
+  url      — optional link target
+  url_text — optional link label
+{%- endcomment -%}
+{%- if include.body -%}
+<div class="notice notice--{{ include.variant | default: 'info' }}" role="note">
+  {%- if include.title -%}<p class="notice__title">{{ include.title }}</p>{%- endif -%}
+  <p class="notice__body">{{ include.body | strip_newlines | strip }}</p>
+  {%- if include.url and include.url_text -%}
+  <p class="notice__action"><a href="{{ include.url | relative_url }}">{{ include.url_text }}</a></p>
+  {%- endif -%}
+</div>
+{%- endif -%}

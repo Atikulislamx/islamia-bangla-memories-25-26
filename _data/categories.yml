@@ -1,0 +1,42 @@
+# Editorial categories shared by the Memories archive, the Events archive and
+# the memory detail pages. Adding a category here makes it selectable in the
+# Decap CMS admin panel (admin/config.yml) and in archive filters.
+memories:
+  - id: "classroom"
+    label: "Classroom Moments"
+    description: "Lectures, seminars, presentations and everyday study life."
+  - id: "campus"
+    label: "Campus Life"
+    description: "Corridors, library hours, canteen breaks and the college ground."
+  - id: "literary"
+    label: "Literary Activities"
+    description: "Readings, recitations, little magazines and writing practice."
+  - id: "friendship"
+    label: "Friendship"
+    description: "Study groups, exam weeks and the friendships built around them."
+  - id: "department"
+    label: "Department"
+    description: "Departmental programmes, results days and academic milestones."
+  - id: "reflection"
+    label: "Personal Reflection"
+    description: "First-person notes on what the Bengali department has meant."
+
+events:
+  - id: "academic"
+    label: "Academic"
+  - id: "cultural"
+    label: "Cultural"
+  - id: "departmental"
+    label: "Departmental"
+  - id: "community"
+    label: "Community"
+
+# Quote categories. Public-domain and permission-checked categories are kept
+# separate so that readers can see why a quotation is published.
+quotes:
+  - id: "public-domain"
+    label: "Public Domain"
+  - id: "matched-pair"
+    label: "Public Domain (Bengali original with English translation)"
+  - id: "contributor"
+    label: "Contributor Reflection"

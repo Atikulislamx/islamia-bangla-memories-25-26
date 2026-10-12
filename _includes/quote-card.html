@@ -1,0 +1,35 @@
+{%- comment -%}
+Quotation card for the Quotes wall.
+
+Parameter: item — a document from the _quotes collection.
+`lang` on the blockquote keeps Bengali quotations rendering with the correct
+language attribute and typography.
+{%- endcomment -%}
+{%- assign quote = include.item -%}
+{%- assign category_label = "" -%}
+{%- if quote.category -%}
+  {%- assign category_match = site.data.categories.quotes | where: "id", quote.category | first -%}
+  {%- assign category_label = category_match.label | default: quote.category -%}
+{%- endif -%}
+<figure class="quote-card{% if quote.sample %} quote-card--sample{% endif %}"
+        data-filter-item
+        data-cat="{{ quote.category | default: 'uncategorised' }}"
+        data-lang="{{ quote.lang | default: 'en' }}"
+        data-sample="{{ quote.sample | default: false }}">
+  <blockquote class="quote-card__quote"{% if quote.lang %} lang="{{ quote.lang }}"{% endif %}>
+    <p>{{ quote.quote | strip_newlines | strip }}</p>
+  </blockquote>
+  <figcaption class="quote-card__meta">
+    {%- if quote.author -%}
+    <span class="quote-card__author">{{ quote.author }}</span>
+    {%- else -%}
+    <span class="quote-card__author">Contributor reflection</span>
+    {%- endif -%}
+    {%- if quote.source %}<cite class="quote-card__source">{{ quote.source }}</cite>{% endif -%}
+    {%- if quote.translation %}<span class="quote-card__translation" lang="en">{{ quote.translation }}</span>{% endif -%}
+    <span class="quote-card__footer">
+      {%- if category_label != "" %}<span class="badge badge--category">{{ category_label }}</span>{% endif -%}
+      {% include sample-badge.html item=quote %}
+    </span>
+  </figcaption>
+</figure>

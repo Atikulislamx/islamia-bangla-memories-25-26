@@ -1,0 +1,73 @@
+{%- comment -%}
+Shared site footer — included by every layout, so it is rendered on every
+public page including collection-generated detail pages, search, the privacy
+page and the custom 404 page.
+
+It contains, in this order:
+  1. website identity
+  2. the primary tagline
+  3. main navigation links (grouped)
+  4. privacy + contribution + repository links
+  5. copyright notice
+  6. the mandatory developer credit
+
+The developer credit is sourced from site.developer in _config.yml. Do not
+duplicate it anywhere else.
+{%- endcomment -%}
+<footer class="site-footer">
+  <div class="container footer__grid">
+    <div class="footer__identity">
+      <p class="footer__brand">{{ site.institution.department }}</p>
+      <p class="footer__brand-sub">{{ site.institution.name }} <span aria-hidden="true">·</span> {{ site.institution.batch }}</p>
+      <p class="footer__tagline">{{ site.tagline }}</p>
+      <p class="footer__tagline-alt">{{ site.supporting_tagline }}</p>
+      <p class="footer__meta">{{ site.institution.location }}</p>
+      <p class="footer__disclaimer">{{ site.disclaimer }}</p>
+    </div>
+
+    {%- for group in site.data.navigation.footer %}
+    <nav class="footer__group" aria-labelledby="footer-heading-{{ group.title | slugify }}">
+      <h2 class="footer__heading" id="footer-heading-{{ group.title | slugify }}">{{ group.title }}</h2>
+      <ul class="footer__links">
+        {%- for link in group.links %}
+        <li><a href="{{ link.url | relative_url }}">{{ link.label }}</a></li>
+        {%- endfor %}
+      </ul>
+    </nav>
+    {%- endfor %}
+
+    <div class="footer__group">
+      <h2 class="footer__heading" id="footer-heading-project">Project</h2>
+      <ul class="footer__links">
+        <li><a href="{{ site.github_repo_url }}" rel="noopener">GitHub Repository<span class="u-visually-hidden"> (opens in a new tab)</span></a></li>
+        <li><a href="{{ '/sitemap.xml' | relative_url }}">Sitemap</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__credit">
+      <h2 class="footer__heading" id="footer-heading-credits">Credits</h2>
+      <p class="developer-credit">
+        <span class="developer-credit__line">{{ site.developer.credit_line }}</span>
+        <span class="developer-credit__role">{{ site.developer.role }}</span>
+        <a class="developer-credit__link" href="{{ site.developer.github_url }}" rel="noopener me">
+          github.com/{{ site.developer.github_username }}<span class="u-visually-hidden"> (opens in a new tab)</span>
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p class="footer__copyright">
+      <span aria-hidden="true">©</span> {{ site.time | date: "%Y" }}
+      {{ site.institution.department }}, {{ site.institution.batch }}.
+      Memory contributions remain the property of their authors.
+    </p>
+    <p class="footer__bottom-links">
+      <a href="{{ '/privacy/' | relative_url }}">Privacy Policy</a>
+      <span aria-hidden="true">·</span>
+      <a href="{{ '/contribute/' | relative_url }}">Contribute a Memory</a>
+      <span aria-hidden="true">·</span>
+      <a href="{{ '/' | relative_url }}">Back to Home</a>
+    </p>
+  </div>
+</footer>

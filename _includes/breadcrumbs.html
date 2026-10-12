@@ -1,0 +1,42 @@
+{%- comment -%}
+Breadcrumb navigation plus matching BreadcrumbList structured data.
+
+Parameters:
+  parent_title — label of the section the current page belongs to
+  parent_url   — URL of that section (e.g. "/memories/")
+  trail        — optional array of "{label}|{url}" strings for deeper trails
+
+Example: {% include breadcrumbs.html parent_title="Memories" parent_url="/memories/" %}
+{%- endcomment -%}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol class="breadcrumbs__list">
+    <li class="breadcrumbs__item">
+      <a href="{{ '/' | relative_url }}">Home</a>
+    </li>
+    {%- if include.parent_title %}
+    <li class="breadcrumbs__item">
+      <a href="{{ include.parent_url | relative_url }}">{{ include.parent_title }}</a>
+    </li>
+    {%- endif %}
+    <li class="breadcrumbs__item">
+      <span aria-current="page">{{ page.title }}</span>
+    </li>
+  </ol>
+</nav>
+
+{%- capture breadcrumb_ld -%}
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": {{ '/' | absolute_url | jsonify }}}
+    {%- if include.parent_title %},
+    {"@type": "ListItem", "position": 2, "name": {{ include.parent_title | jsonify }}, "item": {{ include.parent_url | absolute_url | jsonify }}},
+    {"@type": "ListItem", "position": 3, "name": {{ page.title | jsonify }}, "item": {{ page.url | absolute_url | jsonify }}}
+    {%- else %},
+    {"@type": "ListItem", "position": 2, "name": {{ page.title | jsonify }}, "item": {{ page.url | absolute_url | jsonify }}}
+    {%- endif %}
+  ]
+}
+{%- endcapture -%}
+<script type="application/ld+json">{{ breadcrumb_ld | strip }}</script>

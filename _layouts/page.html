@@ -1,0 +1,37 @@
+---
+layout: default
+---
+{%- assign has_hero = false -%}
+{%- if page.image -%}{%- assign has_hero = true -%}{%- endif -%}
+<div class="container">
+  {% include breadcrumbs.html parent_title=page.parent_title parent_url=page.parent_url %}
+
+  <header class="page-header">
+    {%- if page.eyebrow %}<p class="page-header__eyebrow">{{ page.eyebrow }}</p>{%- endif %}
+    <h1 class="page-header__title"{% if page.lang == 'bn' %} lang="bn"{% endif %}>{{ page.title }}</h1>
+    {%- if page.lede %}<p class="page-header__lede"{% if page.lede_lang %} lang="{{ page.lede_lang }}"{% endif %}>{{ page.lede | strip_newlines | strip }}</p>{%- endif %}
+    {%- if page.lede_bn %}<p class="page-header__lede page-header__lede--bn" lang="bn">{{ page.lede_bn | strip_newlines | strip }}</p>{%- endif %}
+  </header>
+
+  {%- if has_hero %}
+  {% include figure.html image=page.image alt=page.image_alt caption=page.caption lang=page.lang extra_class="page-header__figure" loading="eager" ratio="16 / 9" %}
+  {%- endif %}
+
+  <div class="prose{% if page.prose_narrow %} prose--narrow{% endif %}"{% if page.lang %} lang="{{ page.lang }}"{% endif %}>
+    {{ content }}
+  </div>
+
+  {%- if page.show_contribute_cta %}
+  <aside class="cta-panel" aria-labelledby="cta-panel-title">
+    <h2 class="cta-panel__title" id="cta-panel-title">Contribute a Memory</h2>
+    <p class="cta-panel__body">
+      Members of the batch can suggest memories, events, quotations and
+      consent-cleared photographs for the archive.
+    </p>
+    <p class="cta-panel__action">
+      <a class="button button--primary" href="{{ '/contribute/' | relative_url }}">Contribute a Memory</a>
+      <a class="button button--ghost" href="{{ '/search/' | relative_url }}">Search the Archive</a>
+    </p>
+  </aside>
+  {%- endif %}
+</div>

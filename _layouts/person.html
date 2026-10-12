@@ -1,0 +1,68 @@
+---
+layout: default
+---
+{%- assign person_memories = site.memories | where: "author", page.name -%}
+<article class="entry entry--person">
+  <div class="container container--reading">
+    {% include breadcrumbs.html parent_title="Batch Members" parent_url="/people/" %}
+
+    <header class="entry__header">
+      <p class="entry__meta">
+        {%- if page.role %}<span class="entry__category">{{ page.role }}</span>{% endif -%}
+        {% include sample-badge.html item=page %}
+      </p>
+      <h1 class="entry__title"{% if page.lang == 'bn' %} lang="bn"{% endif %}>{{ page.name | default: page.title }}</h1>
+      {%- if page.batch %}<p class="entry__subtitle">{{ site.institution.department }} <span aria-hidden="true">·</span> {{ page.batch }}</p>{%- endif %}
+    </header>
+
+    <div class="profile">
+      {%- if page.photo %}
+      <div class="profile__media">
+        <img src="{% include image-url.html path=page.photo %}"
+             alt="{{ page.photo_alt | default: 'Profile photograph' | escape }}"
+             loading="lazy" decoding="async">
+      </div>
+      {%- endif %}
+      <div class="profile__body">
+        <div class="prose"{% if page.lang %} lang="{{ page.lang }}"{% endif %}>
+          {{ content }}
+        </div>
+
+        <h2 class="profile__subheading">Publication consent</h2>
+        {%- if page.sample %}
+        <p class="profile__consent profile__consent--na">
+          Not applicable — this is a structural placeholder profile used to
+          demonstrate the layout. It does not describe a real person.
+        </p>
+        {%- elsif page.permission_confirmed %}
+        <p class="profile__consent profile__consent--confirmed">
+          The member confirmed consent to publish this profile and photograph.
+        </p>
+        {%- else %}
+        <p class="profile__consent profile__consent--pending">
+          Consent has not been recorded, so this profile should not be
+          published. See PRIVACY_AND_CONSENT.md.
+        </p>
+        {%- endif %}
+      </div>
+    </div>
+
+    {%- if person_memories.size > 0 %}
+    <section class="related-section" aria-labelledby="person-memories-title">
+      <h2 class="related-section__title" id="person-memories-title">Memories from this member</h2>
+      <ul class="related-list">
+        {%- for memory in person_memories %}
+        <li class="related-list__item">
+          <a href="{{ memory.url | relative_url }}"{% if memory.lang == 'bn' %} lang="bn"{% endif %}>{{ memory.title }}</a>
+        </li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+
+    <p class="entry__return">
+      <a class="button button--ghost" href="{{ '/people/' | relative_url }}">Back to Batch Members</a>
+      <a class="button button--quiet" href="{{ '/' | relative_url }}">Back to Home</a>
+    </p>
+  </div>
+</article>

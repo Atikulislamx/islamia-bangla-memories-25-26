@@ -1,0 +1,68 @@
+# ---------------------------------------------------------------------------
+# Photo Gallery content
+# ---------------------------------------------------------------------------
+# Every entry below is clearly-labelled placeholder artwork, not a photograph
+# of the college, the batch or any identifiable student. Replace the files in
+# assets/img/ and update the captions (or delete the entries) once authentic,
+# consent-checked photographs are supplied.
+#
+# Required fields:  image, alt
+# Optional fields:  caption, date, event, credit
+#   alt     — accessible description of the image (never leave empty)
+#   caption — short visible caption, English-first, Bengali allowed
+#   lang    — "en" (default) or "bn" when the caption is Bengali
+# ---------------------------------------------------------------------------
+notice: >-
+  The images below are abstract placeholder artwork supplied with the project
+  so that the gallery layout can be reviewed. They are not photographs of the
+  college, the department, the batch or any individual. See
+  PRIVACY_AND_CONSENT.md before publishing real photographs.
+
+items:
+  - image: "/assets/img/gallery-01.jpg"
+    alt: >-
+      Placeholder artwork: abstract ink-wash composition in deep green and warm
+      amber with hand-drawn Bengali letterforms.
+    caption: "Placeholder artwork — abstract Bengali letterform composition"
+    lang: "en"
+    credit: "Project placeholder artwork"
+
+  - image: "/assets/img/gallery-02.jpg"
+    alt: >-
+      Placeholder artwork: a closed notebook and a pen resting on a textured
+      ivory desk surface.
+    caption: "Placeholder artwork — notebook and pen, still life"
+    lang: "en"
+    credit: "Project placeholder artwork"
+
+  - image: "/assets/img/gallery-03.jpg"
+    alt: >-
+      Placeholder artwork: soft afternoon light falling through a window frame
+      onto a plain wall.
+    caption: "Placeholder artwork — window light study"
+    lang: "en"
+    credit: "Project placeholder artwork"
+
+  - image: "/assets/img/gallery-04.jpg"
+    alt: >-
+      Placeholder artwork: geometric terracotta and ivory tile pattern inspired
+      by Bangladeshi textile motifs.
+    caption: "Placeholder artwork — terracotta geometric pattern"
+    lang: "en"
+    credit: "Project placeholder artwork"
+
+  - image: "/assets/img/gallery-05.jpg"
+    alt: >-
+      Placeholder artwork: an open book with blank pages on a muted green
+      surface, photographed from above.
+    caption: "Placeholder artwork — open book, overhead view"
+    lang: "en"
+    credit: "Project placeholder artwork"
+
+  - image: "/assets/img/gallery-06.jpg"
+    alt: >-
+      Placeholder artwork: an impressionistic riverside landscape at dusk in
+      warm ochre and deep green tones.
+    caption: "Placeholder artwork — riverbank at dusk"
+    lang: "en"
+    credit: "Project placeholder artwork"

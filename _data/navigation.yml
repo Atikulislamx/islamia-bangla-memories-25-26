@@ -1,0 +1,44 @@
+# Primary navigation — English labels, identical on every page.
+# The order here is the order rendered in the header and the mobile menu.
+main:
+  - label: "Home"
+    url: "/"
+  - label: "Our Journey"
+    url: "/journey/"
+  - label: "Memories"
+    url: "/memories/"
+  - label: "Events"
+    url: "/events/"
+  - label: "Quotes"
+    url: "/quotes/"
+  - label: "Photo Gallery"
+    url: "/gallery/"
+  - label: "About Us"
+    url: "/about/"
+
+# Footer navigation, grouped for scanability.
+footer:
+  - title: "Explore"
+    links:
+      - label: "Our Journey"
+        url: "/journey/"
+      - label: "Memories"
+        url: "/memories/"
+      - label: "Events"
+        url: "/events/"
+      - label: "Quotes"
+        url: "/quotes/"
+      - label: "Photo Gallery"
+        url: "/gallery/"
+  - title: "Archive"
+    links:
+      - label: "About Us"
+        url: "/about/"
+      - label: "Batch Members"
+        url: "/people/"
+      - label: "Search"
+        url: "/search/"
+      - label: "Contribute a Memory"
+        url: "/contribute/"
+      - label: "Privacy Policy"
+        url: "/privacy/"

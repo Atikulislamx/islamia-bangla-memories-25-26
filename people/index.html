@@ -1,0 +1,60 @@
+---
+layout: archive
+title: "Batch Members"
+eyebrow: "People"
+lede: >-
+  Optional profiles of members of the Honours Batch 2025–26. A profile is
+  published only when that member has confirmed how their name, biography and
+  photograph may be used.
+archive_note: >-
+  Profile publication is always the member's choice. A member who prefers not to
+  appear here is not listed, and that choice is respected without comment.
+permalink: /people/
+description: >-
+  Optional, consent-cleared member profiles from the Department of Bengali,
+  Honours Batch 2025–26.
+search_include: true
+---
+{%- assign listed_count = 0 -%}
+{%- assign withheld_count = 0 -%}
+{%- for person in site.people -%}
+  {%- if person.permission_confirmed or person.sample -%}
+    {%- assign listed_count = listed_count | plus: 1 -%}
+  {%- else -%}
+    {%- assign withheld_count = withheld_count | plus: 1 -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<section class="section" aria-labelledby="people-title">
+  <div class="container">
+    {%- if site.sample_content %}
+    {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+    {%- endif %}
+
+    <h2 class="section-title section-title--quiet" id="people-title">
+      {%- if listed_count > 0 -%}
+        {{ listed_count }} {% if listed_count == 1 %}profile{% else %}profiles{% endif %} published
+      {%- else -%}
+        Member profiles
+      {%- endif -%}
+    </h2>
+
+    {%- if listed_count > 0 %}
+    <ul class="card-grid card-grid--people">
+      {%- for person in site.people -%}
+        {%- if person.permission_confirmed or person.sample -%}
+          <li class="card-grid__item">{% include person-card.html item=person %}</li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+    {%- else %}
+    {% include empty-state.html title="No profiles published yet" body="Profiles are optional and are published only with the member's consent. Until then this page stays empty by design." url="/contribute/" url_text="Contribute a Memory" %}
+    {%- endif %}
+
+    {%- if withheld_count > 0 %}
+    {% include notice.html variant="warning" title="Profiles awaiting consent" body="One or more profiles exist in the repository but are not published, because consent has not been recorded. They are excluded from every listing, from search and from the sitemap." %}
+    {%- endif %}
+
+    {% include notice.html variant="info" title="How consent works here" body="Consent is recorded as a field in the profile file. A profile without recorded consent is never rendered, even if the file exists in the public repository — which is also why members should only send details they are comfortable appearing publicly." url="/privacy/" url_text="Read the Privacy Policy" %}
+  </div>
+</section>

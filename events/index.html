@@ -1,0 +1,60 @@
+---
+layout: archive
+title: "Events"
+eyebrow: "Archive"
+lede: >-
+  Programmes, seminars, cultural evenings and departmental gatherings recorded
+  by the batch. Each event has its own page with the date, the venue and, where
+  permission allows, photographs.
+archive_note: >-
+  Upcoming events are listed only when a date has been confirmed by the
+  department or the batch. No event is invented, and sample entries are marked
+  as such.
+permalink: /events/
+description: >-
+  Events archive of the Department of Bengali, Honours Batch 2025–26:
+  academic programmes, cultural events and departmental gatherings.
+search_include: true
+---
+{%- assign ordered_events = site.events | sort: "date" | reverse -%}
+{%- assign now_ts = site.time | date: "%s" | plus: 0 -%}
+{%- assign upcoming_count = 0 -%}
+{%- for event in site.events -%}
+  {%- assign event_ts = event.date | date: "%s" | plus: 0 -%}
+  {%- if event_ts > now_ts -%}{%- assign upcoming_count = upcoming_count | plus: 1 -%}{%- endif -%}
+{%- endfor -%}
+
+<section class="section" aria-labelledby="events-list-title">
+  <div class="container">
+    {%- if site.sample_content %}
+    {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+    {%- endif %}
+
+    <h2 class="section-title section-title--quiet" id="events-list-title">
+      {%- if ordered_events.size > 0 -%}
+        {{ ordered_events.size }} {% if ordered_events.size == 1 %}event{% else %}events{% endif %} in the archive
+        {%- if upcoming_count > 0 %} · {{ upcoming_count }} upcoming{% endif %}
+      {%- else -%}
+        Event archive
+      {%- endif -%}
+    </h2>
+
+    {% include archive-filters.html group="events" statuses=true legend="Filter events" %}
+
+    {%- if ordered_events.size > 0 %}
+    <ul class="card-grid card-grid--events">
+      {%- for event in ordered_events %}
+      <li class="card-grid__item">{% include event-card.html item=event %}</li>
+      {%- endfor %}
+    </ul>
+    <div class="empty-state" data-filter-empty hidden>
+      <p class="empty-state__title">No events match these filters</p>
+      <p class="empty-state__body">Try “All Events”, or choose a different category.</p>
+    </div>
+    {%- else %}
+    {% include empty-state.html title="No events published yet" body="Verified events appear here with their own page. Upcoming events are added only once a date is confirmed." url="/contribute/" url_text="Suggest an event" %}
+    {%- endif %}
+
+    {% include notice.html variant="info" title="Upcoming and past events" body="The Upcoming / Past label is derived from the event date every time the website is built, so it is never stale. An event is only added with a confirmed date and venue." url="/journey/" url_text="See the batch timeline" %}
+  </div>
+</section>

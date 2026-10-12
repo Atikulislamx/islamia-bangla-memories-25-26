@@ -1,0 +1,51 @@
+---
+layout: archive
+title: "Our Journey"
+eyebrow: "Timeline"
+lede: >-
+  The batch's chronology: enrolment, first classes, departmental programmes and
+  the milestones that were worth writing down. Entries are added only when the
+  details can be verified.
+archive_note: >-
+  Nothing on this timeline is invented. Where a milestone has not yet been
+  confirmed by the batch or the department, the entry is simply absent.
+permalink: /journey/
+description: >-
+  A chronological timeline of the Department of Bengali, Honours Batch 2025–26 —
+  verified milestones, programmes and moments from the journey.
+search_include: true
+---
+{%- assign ordered_timeline = site.timeline | sort: "date" -%}
+{%- assign sample_entries = 0 -%}
+{%- for entry in ordered_timeline -%}
+  {%- if entry.sample -%}{%- assign sample_entries = sample_entries | plus: 1 -%}{%- endif -%}
+{%- endfor -%}
+
+<section class="section" aria-labelledby="journey-title">
+  <div class="container">
+    {%- if site.sample_content and sample_entries > 0 %}
+    {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+    {%- endif %}
+
+    <h2 class="section-title section-title--quiet" id="journey-title">
+      {%- if ordered_timeline.size > 0 -%}
+        {{ ordered_timeline.size }} {% if ordered_timeline.size == 1 %}entry{% else %}entries{% endif %} on the timeline
+        {%- if sample_entries > 0 %} · {{ sample_entries }} sample placeholder{% if sample_entries > 1 %}s{% endif %}{% endif %}
+      {%- else -%}
+        Batch timeline
+      {%- endif -%}
+    </h2>
+
+    {%- if ordered_timeline.size > 0 %}
+    <ol class="timeline">
+      {%- for entry in ordered_timeline %}
+      {% include timeline-entry.html item=entry %}
+      {%- endfor %}
+    </ol>
+    {%- else %}
+    {% include empty-state.html title="The timeline is waiting for verified milestones" body="A timeline is only useful if it is true. As soon as the batch confirms dates and details for enrolment, first classes, programmes and results, entries are added here in order." url="/contribute/" url_text="Suggest a milestone" %}
+    {%- endif %}
+
+    {% include notice.html variant="info" title="Where the dates come from" body="Each entry carries a date or an approximate period supplied by the batch. Approximate periods are written as such, for example “March 2025 (approximate)”, rather than being presented as exact dates." url="/memories/" url_text="Read the memories" %}
+  </div>
+</section>

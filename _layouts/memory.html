@@ -1,0 +1,61 @@
+---
+layout: default
+---
+{%- assign category_label = "" -%}
+{%- if page.category -%}
+  {%- assign category_match = site.data.categories.memories | where: "id", page.category | first -%}
+  {%- assign category_label = category_match.label | default: page.category -%}
+{%- endif -%}
+{%- assign related_event = site.events | where: "slug", page.related_event | first -%}
+
+<article class="entry entry--memory">
+  <div class="container container--reading">
+    {% include breadcrumbs.html parent_title="Memories" parent_url="/memories/" %}
+
+    <header class="entry__header">
+      <p class="entry__meta">
+        {%- if category_label != "" %}<span class="entry__category">{{ category_label }}</span>{% endif -%}
+        {%- if page.date %}<time class="entry__date" datetime="{{ page.date | date: '%Y-%m-%d' }}">{{ page.date | date: "%-d %B %Y" }}</time>{% endif -%}
+        {% include sample-badge.html item=page %}
+      </p>
+      <h1 class="entry__title"{% if page.lang == 'bn' %} lang="bn"{% endif %}>{{ page.title }}</h1>
+      {%- if page.subtitle %}<p class="entry__subtitle">{{ page.subtitle }}</p>{%- endif -%}
+      {%- if page.author %}<p class="entry__byline">Contributed by <span class="entry__author">{{ page.author }}</span></p>{%- endif -%}
+    </header>
+  </div>
+
+  {%- if page.image %}
+  <div class="container container--wide">
+    {% include figure.html image=page.image alt=page.image_alt caption=page.caption lang=page.lang extra_class="entry__figure" loading="eager" ratio="16 / 9" %}
+  </div>
+  {%- endif %}
+
+  <div class="container container--reading">
+    <div class="prose prose--entry"{% if page.lang %} lang="{{ page.lang }}"{% endif %} data-reading-progress>
+      {{ content }}
+    </div>
+
+    {%- if page.pullquote %}
+    <blockquote class="pullquote"{% if page.lang == 'bn' %} lang="{{ page.lang }}"{% endif %}>
+      <p>{{ page.pullquote }}</p>
+    </blockquote>
+    {%- endif %}
+
+    {%- if related_event %}
+    <aside class="related-panel" aria-labelledby="related-event-title">
+      <h2 class="related-panel__title" id="related-event-title">Related event</h2>
+      <p class="related-panel__body">
+        <a href="{{ related_event.url | relative_url }}">{{ related_event.title }}</a>
+        {%- if related_event.date %} — <time datetime="{{ related_event.date | date: '%Y-%m-%d' }}">{{ related_event.date | date: "%-d %B %Y" }}</time>{% endif %}
+      </p>
+    </aside>
+    {%- endif %}
+
+    {% include related-memories.html exclude_url=page.url category=page.category limit=3 section_id="memory" %}
+
+    <p class="entry__return">
+      <a class="button button--ghost" href="{{ '/memories/' | relative_url }}">Back to Memories</a>
+      <a class="button button--quiet" href="{{ '/' | relative_url }}">Back to Home</a>
+    </p>
+  </div>
+</article>
