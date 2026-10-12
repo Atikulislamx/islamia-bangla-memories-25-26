@@ -15,7 +15,6 @@ image_alt: "Placeholder artwork: an impressionistic riverside landscape at dusk 
 caption: "Placeholder artwork — replace with a consented photograph."
 featured: true
 sample: true
-related_memory_note: "Linked to the sample memory about library afternoons."
 ---
 
 > **This is a sample event.** The date, venue and programme details have not been

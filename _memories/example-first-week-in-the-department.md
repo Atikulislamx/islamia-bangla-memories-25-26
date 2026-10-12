@@ -12,7 +12,6 @@ excerpt: >-
 image: "/assets/img/gallery-02.jpg"
 image_alt: "Placeholder artwork: a closed notebook and a pen on a textured ivory desk surface."
 caption: "Placeholder artwork — replace with a consented photograph from the batch."
-image_position: "top"
 featured: true
 sample: true
 related_event: "example-orientation-programme"

@@ -8,14 +8,8 @@ category: "cultural"
 organiser: "Department of Bengali (placeholder entry)"
 lang: "en"
 description: >-
-  A sample cultural event entry, showing a Bengali-language event description,
-  a linked memory and a gallery without a cover image.
-lang_note: >-
-  The description below is written in Bengali to demonstrate Bengali typography
-  inside the event layout.
-description_bn: >-
-  একটি নমুনা সাংস্কৃতিক অনুষ্ঠানের বর্ণনা — প্রকৃত ঘটনার বর্ণনা নয়। বাংলা
-  টাইপোগ্রাফি কীভাবে লেআউটে দেখা যাবে, শুধু সেটিই দেখানোর জন্য রাখা হয়েছে।
+  A sample cultural event entry showing a Bengali-language description block
+  inside the body, a photograph gallery and no cover image.
 image: "/assets/img/gallery-04.jpg"
 image_alt: "Placeholder artwork: geometric terracotta and ivory tile pattern."
 caption: "Placeholder artwork — replace with a consented photograph of the evening."
@@ -32,6 +26,10 @@ gallery:
 An evening of recitation and reading: students read original poetry, passages
 from Bengali classics and, occasionally, their own translations. The programme
 usually ends with open-floor readings, where anyone can read for two minutes.
+
+<p lang="bn">এটি একটি নমুনা সাংস্কৃতিক অনুষ্ঠানের বর্ণনা — প্রকৃত ঘটনার বর্ণনা নয়।
+বাংলা অনুচ্ছেদ কীভাবে এই লেআউটে দেখা যাবে, শুধু সেটিই দেখানোর জন্য রাখা হয়েছে।
+অনুষ্ঠানের বর্ণনা লেখার সময় তারিখ, স্থান ও আয়োজকের তথ্য নিশ্চিত হয়ে নেওয়া জরুরি।</p>
 
 ## Why cultural evenings belong in the archive
 
