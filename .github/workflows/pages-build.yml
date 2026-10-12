@@ -237,15 +237,7 @@ jobs:
           print(f'front matter valid: {checked} content files')
           PY
 
-      - name: Upload the built site for review
-        uses: actions/upload-artifact@v4
-        with:
-          name: github-pages-build
-          path: _site
-          retention-days: 7
-          if-no-files-found: error
-          include-hidden-files: true
-
+      - name: Check the CMS configuration matches the content structure
         run: |
           python3 - <<'PY'
           import re, sys
@@ -282,3 +274,14 @@ jobs:
               sys.exit(1)
           print(f'CMS config valid: {len(cms_collections)} collections cross-checked against _config.yml')
           PY
+
+      # The built site is published as an artifact so the real Jekyll output can
+      # be inspected (and compared with the preview build) without deploying.
+      - name: Upload the built site for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages-build
+          path: _site
+          retention-days: 7
+          if-no-files-found: error
+          include-hidden-files: true
