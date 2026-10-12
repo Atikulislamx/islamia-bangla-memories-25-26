@@ -258,10 +258,17 @@ jekyll build && python3 -m http.server 8000 --directory _site
 ```
 
 CI runs the authoritative build on every push and pull request — see
-`.github/workflows/pages-build.yml`. It checks that the build produces the
-required pages, that the developer credit is present in every generated HTML
-file, that the search index and sitemap are valid, that no baseurl-less internal
-paths exist, and that `admin/config.yml` matches the Jekyll collections.
+`.github/workflows/pages-build.yml`. It installs the same `github-pages` gem set
+GitHub Pages uses, builds the site, and then checks the real output: required
+pages exist, the developer credit is present in **every** generated HTML file, no
+page has an empty `og:image` or a canonical URL outside the project path, every
+page has exactly one `h1` and a unique title, no baseurl-less internal paths or
+raw Liquid remain, the search index and sitemap are valid, the front matter
+conforms to the schema, and `admin/config.yml` matches the Jekyll collections.
+The built site is uploaded as a short-lived artifact so the real output can be
+inspected without deploying. The current run passes all 14 steps:
+
+<https://github.com/Atikulislamx/islamia-bangla-memories-25-26/actions/runs/38221686806>
 
 ---
 

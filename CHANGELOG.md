@@ -112,8 +112,18 @@ configuration and the documentation.
   a missing developer credit in any generated page, unrendered Liquid,
   baseurl-less internal paths, an invalid search index or sitemap, and a CMS
   configuration that does not match the Jekyll collections.
-- Sandbox QA: 20 pages, 622 internal links, 35 images checked with zero errors
-  and zero warnings; CMS pre-flight logic unit-tested (6 cases).
+- **Verified on the real Jekyll environment:** the GitHub Actions build check ran
+  the actual `github-pages` gem build and passed all 14 steps — including that the
+  developer credit is present in every generated HTML file, that no internal path
+  is missing the baseurl, that no template leaves raw Liquid behind, that every
+  page has a resolved `og:image` and exactly one `h1`, and that the search index,
+  sitemap, front matter and CMS configuration are all valid. Run:
+  https://github.com/Atikulislamx/islamia-bangla-memories-25-26/actions/runs/38221686806
+- Sandbox QA: 20 pages, 622 internal links, 35 images checked with zero errors and
+  one documented warning (the focus outline is replaced by a two-tone ring with a
+  `forced-colors` fallback); CSS-only static analysis; 15 content files validated;
+  colour contrast measured across 22 pairs; CMS pre-flight logic unit-tested
+  (6 cases).
 
 ### Added — content safety
 
@@ -126,6 +136,25 @@ configuration and the documentation.
 - Developer credit appears site-wide as **Atikul Islam Rabbi, Student,
   Department of Bengali**, sourced from `_config.yml` and rendered by the shared
   footer.
+
+### Fixed during verification
+
+- `og:image` was empty on every page (an include nested inside a `capture` lost its
+  argument) — social previews would have been broken.
+- The search index was invalid JSON (a leading `[` was sliced away), and content
+  `excerpt` fields rendered as `undefined` in the index.
+- Several pages shared a single meta description; descriptions are now derived per
+  page.
+- One colour pair failed WCAG AA contrast (the hero “Sample content” flag at
+  4.42:1); a dedicated `--amber-text` token now passes at 5.72:1, and the
+  “Consent confirmed” label moved to a darker emerald.
+- The focus indicator was replaced by a two-tone ring, because no single colour
+  clears 3:1 against both the ivory pages and the forest-green footer.
+- HTML validation issues: `<img src="">` in the lightbox, a redundant
+  `role="contentinfo"`, a lowercase DOCTYPE and two unnamed `<aside>` landmarks.
+- Two bugs in the CI workflow itself: a step that carried both `uses` and `run`
+  (which made GitHub reject the whole file and run zero jobs), and a Bengali-font
+  check that looked for the family in the HTML instead of the stylesheet.
 
 ### Notes
 

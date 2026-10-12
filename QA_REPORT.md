@@ -28,8 +28,8 @@ checks that could not be run are listed as unverified rather than omitted.
 | Colour contrast (WCAG 2.1 AA) | **21 of 22 pairs pass**; the one failure was fixed |
 | Secret scan | **0 credentials** found |
 | CMS pre-flight logic tests | **6 of 6 pass** |
-| **Real Jekyll build** | **Not run in the sandbox** — no Ruby available; covered by the CI workflow |
-| **Live GitHub Pages deployment** | **Not verified** — no network access to the host from the sandbox |
+| **Real Jekyll build (GitHub Pages environment)** | **Verified — 14/14 CI steps pass**, run [38221686806](https://github.com/Atikulislamx/islamia-bangla-memories-25-26/actions/runs/38221686806) |
+| **Live GitHub Pages deployment** | **Not verified** — the sandbox cannot reach the host; the deployed site must be spot-checked after merging |
 | **CMS authentication** | **Not verified** — requires dashboard access; see CMS_SETUP.md |
 
 ---
@@ -76,6 +76,42 @@ authoritative build runs in GitHub Actions with the real `github-pages` gem set.
 | Sitemap | valid XML, no out-of-path URLs, no excluded pages | pass (18 URLs) |
 | robots.txt | `Disallow: /admin/`, absolute sitemap reference, no leftover front matter | pass |
 | Secret scan | GitHub token patterns, private keys, AWS keys, `client_secret`/`access_token`/`api_key`/`password` assignments | pass (0 findings) |
+
+### 2.2a Verification on the real build (GitHub Actions)
+
+The workflow `.github/workflows/pages-build.yml` was run on the pull request. It
+installs the `github-pages` gem set — the same Jekyll version, Markdown engine and
+plugin set GitHub Pages uses — builds the site with `JEKYLL_ENV=production`, and
+then checks the **real build output** (not the sandbox render).
+
+**Run [38221686806](https://github.com/Atikulislamx/islamia-bangla-memories-25-26/actions/runs/38221686806): all 14 steps passed.**
+
+| Step | Result |
+| --- | --- |
+| Jekyll build (`github-pages` gem set) | success |
+| Fail if the build produced no output | success |
+| Check required pages and the developer credit | success |
+| Check for unrendered Liquid and invalid internal paths | success |
+| Check rendered page metadata (og:image, canonical, one `h1`, unique titles, no template leakage, Bengali pages load the stylesheet) | success |
+| Validate the search index (JSON, required fields, baseurl-prefixed URLs) | success |
+| Validate the sitemap (well-formed, in-path URLs, no excluded pages) | success |
+| Validate content front matter (required fields, layouts, `image_alt`, marked placeholders) | success |
+| Check the CMS configuration matches the content structure | success |
+| Upload the built site as an artifact | success |
+
+Two facts are now verified in the real Jekyll environment rather than the sandbox:
+
+1. **The developer credit is present in every generated HTML file.** That step
+   reads the built output and fails if `Designed &amp; Developed by Atikul Islam
+   Rabbi` or `Student, Department of Bengali` is missing from any page.
+2. **No internal path is missing the baseurl**, and no template leaves raw Liquid
+   or `undefined` behind — the two failure modes most likely to differ between
+   template engines.
+
+**Limitation:** the build artifact (retained 7 days) could not be downloaded in
+the development environment, because GitHub serves artifacts from a host outside
+its network allow-list. The repository owner can download it from the run page and
+compare it with the live deployment.
 
 ### 2.3 HTML validation
 
@@ -171,6 +207,8 @@ grids and a mobile navigation that switches at 64 rem. Specific measures:
 | 8 | Redundant `role="contentinfo"`; two unnamed `<aside>` landmarks; lowercase DOCTYPE | Low (validation) | **Fixed** — 4 files |
 | 9 | `sort` on collections could fail if a contributor omits `date` | Medium (build resilience) | **Mitigated** — `date` is required by the schema, documented as required, and CI now fails with a clear message instead of a cryptic build error |
 | 10 | Placeholder content could be mistaken for real records | High (trust) | **Addressed by design** — visible badge, page notices, CI rule requiring `sample: true` on `example-*` files |
+| 11 | The workflow itself became invalid when the artifact step was inserted mid-step: one step carried both `uses` and `run`, so GitHub rejected the file and the run failed with **zero jobs** | High (CI silent failure) | **Fixed** — the upload is the last step; a local check now asserts every step has either `uses` or `run`. Reported honestly because it was a failure I introduced and then caught |
+| 12 | The new Bengali-font check looked for the font family name inside each HTML page, but the family is declared in `assets/css/main.css` and never referenced from the markup — so it failed on every Bengali page of a perfectly valid build | Medium (false-positive gate) | **Fixed** — the check now verifies that a Bengali page loads the stylesheet, and that the built stylesheet declares the family and `[lang="bn"]` rules with the font files present |
 
 ---
 
@@ -192,9 +230,12 @@ jekyll build --trace
 
 The CI workflow runs on every push and pull request and fails on: a missing
 required page, a missing developer credit in any generated HTML file, unrendered
-Liquid, a baseurl-less internal path, an invalid search index or sitemap, invalid
-front matter, an image without `image_alt`, an unmarked placeholder, or a CMS
-collection that does not match the Jekyll collections.
+Liquid, a baseurl-less internal path, an empty `og:image`, a canonical URL outside
+the project path, a page without exactly one `h1`, a duplicate page title, an
+invalid search index or sitemap, invalid front matter, an image without
+`image_alt`, an unmarked placeholder, a missing font file, or a CMS collection
+that does not match the Jekyll collections. Its latest run on this branch is
+linked in §2.2a.
 
 ---
 
@@ -202,15 +243,15 @@ collection that does not match the Jekyll collections.
 
 | # | Item | Why | How to verify |
 | --- | --- | --- | --- |
-| 1 | **Real Jekyll / GitHub Pages build** | No Ruby or Jekyll in the sandbox; the package manager is unavailable to the sandbox user | Push to a branch; the `Build check (GitHub Pages)` workflow runs the real build. Then check the live URL |
-| 2 | **Live deployed site** | The sandbox can reach only an allow-list of hosts; `atikulislamx.github.io` and `atikulislam.me` are not on it | Open the published URL and work through DEPLOYMENT.md §3 |
-| 3 | **Browser behaviour** (mobile menu, filters, lightbox, search UI) | No browser or headless Chrome in the sandbox | Load the site and exercise: menu open/close with Escape, category/language filters, lightbox arrows and Escape, a search query and a nonsense query |
-| 4 | **CMS authentication and publishing** | Requires an authenticated Decap Turbo dashboard session | Follow CMS_SETUP.md §4, steps 1–7, in order |
-| 5 | **Automated accessibility audit** (axe / pa11y / Lighthouse) | No browser available | Run Lighthouse or axe DevTools against the deployed site; the semantics, labelling and contrast work above is a manual/static pass, not a substitute |
-| 6 | **Visual screenshots at each breakpoint** | No rendering engine available | Open the site at 320/375/390/430/768/1024/1280/1440 px, or use a device toolbar |
-| 7 | **Bengali shaping in a browser** | Same reason | Confirm that Bengali headings, quotations and captions show correct conjuncts; the font and `lang` attributes are in place, but shaping happens in the browser |
-| 8 | **Custom-domain / canonical-URL interaction** | Could not reach either host | Decide whether `atikulislamx.github.io` or `atikulislam.me` is canonical and set `url` in `_config.yml` accordingly (DEPLOYMENT.md §2, §6) |
-| 9 | **Search behaviour with Bengali text in a real browser** | No browser | Search for a Bengali word from a sample memory, e.g. `রবীন্দ্রনাথ` or `ভাষা`, and confirm results appear |
+| 1 | **Live deployed site** | The development environment can reach only an allow-list of hosts; `atikulislamx.github.io` and `atikulislam.me` are not on it | Merge and work through DEPLOYMENT.md §3 on the published URL |
+| 2 | **Browser behaviour** (mobile menu, filters, lightbox, search UI) | No browser or headless Chrome in the environment | Exercise: menu open/close and Escape, category/language filters, lightbox arrows and Escape, a real search and a nonsense query |
+| 3 | **CMS authentication and publishing** | Requires an authenticated Decap Turbo dashboard session | Follow CMS_SETUP.md §4, steps 1–7, in order |
+| 4 | **Automated accessibility audit** (axe / pa11y / Lighthouse) | No browser available | Run Lighthouse or axe DevTools against the deployed site; the semantics, labelling and contrast work above is a static/manual pass, not a substitute |
+| 5 | **Visual screenshots at each breakpoint** | No rendering engine available | Open the site at 320/375/390/430/768/1024/1280/1440 px, or use a device toolbar |
+| 6 | **Bengali shaping as rendered by a browser** | Same reason | Check Bengali headings, quotations and captions for correct conjuncts and matras; the font, `lang` attributes and line heights are in place, but shaping happens in the browser |
+| 7 | **Custom-domain / canonical-URL interaction** | Neither host could be reached | Decide whether `atikulislamx.github.io` or `atikulislam.me` is canonical and set `url` in `_config.yml` accordingly (DEPLOYMENT.md §2, §6) |
+| 8 | **Search behaviour with Bengali text in a browser** | No browser | Search for a Bengali word from a sample memory, e.g. `রবীন্দ্রনাথ` or `ভাষা`, and confirm results |
+| 9 | **Downloading the real build artifact** | GitHub serves artifacts from a host outside the allow-list | Download `github-pages-build` from the run page (7-day retention) and compare with the preview build |
 
 ### Known limitations that are documented rather than hidden
 
@@ -246,4 +287,5 @@ collection that does not match the Jekyll collections.
 | Privacy and consent documented | yes (public policy + internal guidance) |
 | CMS configuration aligned with the content model | yes; **authentication outstanding** |
 | Documentation complete | yes (README, DEPLOYMENT, CMS_SETUP, CONTENT_GUIDE, PRIVACY_AND_CONSENT, CHANGELOG, QA_REPORT) |
-| Real build, live site, browser and CMS sign-in | **pending — items in §5** |
+| Real Jekyll build in the GitHub Pages environment | **verified — 14/14 CI steps pass** |
+| Live site, browser behaviour and CMS sign-in | **pending — items in §5** |
