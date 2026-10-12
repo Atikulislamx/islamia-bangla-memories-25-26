@@ -96,6 +96,52 @@ jobs:
             exit 1
           fi
 
+      - name: Check rendered page metadata (catches template-engine differences)
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+
+          BASEURL = '/islamia-bangla-memories-25-26'
+          errors = []
+          pages = [p for p in Path('_site').rglob('*.html') if 'admin' not in p.parts]
+
+          for page in pages:
+              html = page.read_text(encoding='utf-8')
+              rel = page.relative_to('_site')
+
+              # Open Graph image must be resolved, not empty: an include that
+              # silently drops its parameter would leave this blank.
+              if not re.search(r'<meta property="og:image" content="[^"]+"', html):
+                  errors.append(f'{rel}: og:image is missing or empty')
+              if not re.search(r'<link rel="canonical" href="https://atikulislamx\.github\.io' + re.escape(BASEURL), html):
+                  errors.append(f'{rel}: canonical URL is missing or outside the project path')
+              if len(re.findall(r'<h1[ >]', html)) != 1:
+                  errors.append(f'{rel}: expected exactly one <h1>')
+              if not re.search(r'<meta name="description" content="[^"]+"', html):
+                  errors.append(f'{rel}: meta description is empty')
+              for token in ('undefined', '[object Object]', 'Liquid error'):
+                  if token in html:
+                      errors.append(f'{rel}: contains "{token}"')
+              if 'lang="bn"' in html and 'Noto Sans Bengali' not in html:
+                  errors.append(f'{rel}: contains Bengali text but no Bengali font reference')
+
+          # Titles must be unique across the site.
+          titles = {}
+          for page in pages:
+              match = re.search(r'<title>([^<]*)</title>', page.read_text(encoding='utf-8'))
+              title = match.group(1) if match else ''
+              if title in titles:
+                  errors.append(f'duplicate title "{title}" in {page.relative_to("_site")} and {titles[title]}')
+              titles[title] = page.relative_to('_site')
+
+          for error in errors:
+              print(f'::error::{error}')
+          if errors:
+              sys.exit(1)
+          print(f'rendered metadata valid on {len(pages)} pages ({len(titles)} unique titles)')
+          PY
+
       - name: Validate the search index
         run: |
           python3 - <<'PY'
@@ -191,7 +237,15 @@ jobs:
           print(f'front matter valid: {checked} content files')
           PY
 
-      - name: Check the CMS configuration matches the content structure
+      - name: Upload the built site for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages-build
+          path: _site
+          retention-days: 7
+          if-no-files-found: error
+          include-hidden-files: true
+
         run: |
           python3 - <<'PY'
           import re, sys
