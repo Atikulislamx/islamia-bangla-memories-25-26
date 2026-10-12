@@ -3,12 +3,11 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 
-# Local preview tooling used during development (never part of the website)
+# Local preview tooling used during development (never part of the website).
+# Node is not required to build or deploy the site.
 _preview/
 tools/
 node_modules/
-package.json
-package-lock.json
 
 # Ruby / Bundler
 .bundle/
