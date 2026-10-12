@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -123,8 +123,29 @@ jobs:
               for token in ('undefined', '[object Object]', 'Liquid error'):
                   if token in html:
                       errors.append(f'{rel}: contains "{token}"')
-              if 'lang="bn"' in html and 'Noto Sans Bengali' not in html:
-                  errors.append(f'{rel}: contains Bengali text but no Bengali font reference')
+              # Bengali text is rendered by the self-hosted font declared in the
+              # stylesheet, so the page must load that stylesheet: the family is
+              # never referenced from the HTML itself.
+              if 'lang="bn"' in html and not re.search(
+                      r'<link rel="stylesheet" href="[^"]*assets/css/main\.css"', html):
+                  errors.append(f'{rel}: contains Bengali text but does not load the site stylesheet')
+
+          # The stylesheet must declare the Bengali family, and the self-hosted
+          # font files must be present in the build output.
+          css = Path('_site/assets/css/main.css')
+          if not css.is_file():
+              errors.append('assets/css/main.css is missing from the build output')
+          else:
+              css_text = css.read_text(encoding='utf-8')
+              if 'Noto Sans Bengali' not in css_text:
+                  errors.append('assets/css/main.css does not declare the Bengali font family')
+              if '[lang="bn"]' not in css_text:
+                  errors.append('assets/css/main.css has no [lang="bn"] rule')
+          for font in ('noto-sans-bengali-bengali-400.woff2',
+                       'inter-latin-400.woff2',
+                       'manrope-latin-700.woff2'):
+              if not (Path('_site/assets/fonts') / font).is_file():
+                  errors.append(f'assets/fonts/{font} is missing from the build output')
 
           # Titles must be unique across the site.
           titles = {}
