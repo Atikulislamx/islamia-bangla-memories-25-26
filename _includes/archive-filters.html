@@ -1,0 +1,59 @@
+{%- comment -%}
+Progressive-enhancement filters for archive pages.
+
+Parameters:
+  categories — array of category ids to offer (looked up in
+               _data/categories.yml under `group`)
+  group      — "memories" or "events" (which category list to read)
+  statuses   — when true, adds Upcoming / Past buttons (Events archive)
+  languages  — when true, adds English / Bengali content buttons
+  legend     — accessible legend text
+
+The buttons only appear when JavaScript is available, because they have no
+effect without it. Cards expose data-cat / data-status / data-lang /
+data-search attributes and are filtered by assets/js/main.js.
+{%- endcomment -%}
+{%- assign category_source = site.data.categories[include.group] -%}
+<div class="filters has-js-only" data-filters>
+  <div class="filters__group" role="group" aria-label="{{ include.legend | default: 'Filter results' }}">
+    <p class="filters__label" id="filters-label-{{ include.group }}">Filter</p>
+    <div class="filters__buttons">
+      <button class="filters__button is-active" type="button"
+              data-filter-group="category" data-filter-value="all" aria-pressed="true">View All</button>
+      {%- for category in category_source %}
+      <button class="filters__button" type="button"
+              data-filter-group="category" data-filter-value="{{ category.id }}" aria-pressed="false">{{ category.label }}</button>
+      {%- endfor %}
+    </div>
+  </div>
+
+  {%- if include.statuses %}
+  <div class="filters__group" role="group" aria-label="Filter by event status">
+    <p class="filters__label">Timing</p>
+    <div class="filters__buttons">
+      <button class="filters__button is-active" type="button"
+              data-filter-group="status" data-filter-value="all" aria-pressed="true">All Events</button>
+      <button class="filters__button" type="button"
+              data-filter-group="status" data-filter-value="upcoming" aria-pressed="false">Upcoming Events</button>
+      <button class="filters__button" type="button"
+              data-filter-group="status" data-filter-value="past" aria-pressed="false">Past Events</button>
+    </div>
+  </div>
+  {%- endif %}
+
+  {%- if include.languages %}
+  <div class="filters__group" role="group" aria-label="Filter by content language">
+    <p class="filters__label">Language</p>
+    <div class="filters__buttons">
+      <button class="filters__button is-active" type="button"
+              data-filter-group="language" data-filter-value="all" aria-pressed="true">All Languages</button>
+      <button class="filters__button" type="button"
+              data-filter-group="language" data-filter-value="en" aria-pressed="false">English</button>
+      <button class="filters__button" type="button"
+              data-filter-group="language" data-filter-value="bn" aria-pressed="false">Bengali <span lang="bn">বাংলা</span></button>
+    </div>
+  </div>
+  {%- endif %}
+
+  <p class="filters__status" data-filter-status aria-live="polite"></p>
+</div>

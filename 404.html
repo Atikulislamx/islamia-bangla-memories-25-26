@@ -1,0 +1,60 @@
+---
+layout: page
+title: "Page Not Found"
+eyebrow: "Error 404"
+lede: >-
+  The page you asked for is not in this archive. It may have been renamed,
+  removed, or never published in the first place.
+permalink: /404.html
+description: >-
+  The requested page could not be found in the Bengali Department digital memory
+  archive.
+noindex: true
+sitemap: false
+---
+
+<div class="empty-state">
+  <p class="empty-state__title">That page does not exist</p>
+  <p class="empty-state__body">
+    This archive only contains pages that were actually published, so a missing
+    page is usually a mistyped or outdated link. Everything below is reachable.
+  </p>
+  <p class="empty-state__action">
+    <a class="button button--primary" href="{{ '/' | relative_url }}">Back to Home</a>
+    <a class="button button--ghost" href="{{ '/search/' | relative_url }}">Search the Archive</a>
+  </p>
+</div>
+
+<h2>Where to go next</h2>
+
+<ul class="card-grid card-grid--nav">
+{%- for item in site.data.navigation.main %}
+  <li class="card-grid__item">
+    <article class="card">
+      <div class="card__body">
+        <h3 class="card__title"><a class="card__link" href="{{ item.url | relative_url }}">{{ item.label }}</a></h3>
+        <p class="card__excerpt">
+          {%- case item.url -%}
+            {%- when "/" -%}The archive at a glance, with featured memories and events.
+            {%- when "/journey/" -%}The batch timeline, built from verified milestones only.
+            {%- when "/memories/" -%}Every published memory, in English and Bengali.
+            {%- when "/events/" -%}Programmes and gatherings, with dates and venues.
+            {%- when "/quotes/" -%}Public-domain quotations and contributor reflections.
+            {%- when "/gallery/" -%}Consent-cleared photographs with captions.
+            {%- when "/about/" -%}Why the archive exists and how it is maintained.
+          {%- endcase -%}
+        </p>
+      </div>
+    </article>
+  </li>
+{%- endfor %}
+</ul>
+
+<h2>Useful pages</h2>
+
+<ul class="related-list">
+  <li class="related-list__item"><a href="{{ '/contribute/' | relative_url }}">Contribute a Memory</a></li>
+  <li class="related-list__item"><a href="{{ '/people/' | relative_url }}">Batch Members</a></li>
+  <li class="related-list__item"><a href="{{ '/privacy/' | relative_url }}">Privacy Policy</a></li>
+  <li class="related-list__item"><a href="{{ site.github_repo_url }}" rel="noopener">GitHub Repository<span class="u-visually-hidden"> (opens in a new tab)</span></a></li>
+</ul>

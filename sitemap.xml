@@ -1,0 +1,61 @@
+---
+layout: null
+permalink: /sitemap.xml
+sitemap: false
+---
+{%- comment -%}
+Sitemap generated without plugins so that the GitHub Pages build needs no gem
+beyond Jekyll itself. Pages marked `sitemap: false` (search index, 404, admin)
+are excluded, as are entries carrying `noindex: true`.
+{%- endcomment -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{ '/' | absolute_url }}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+{%- assign static_pages = site.pages | sort: "url" -%}
+{%- for page in static_pages -%}
+  {%- unless page.sitemap == false or page.noindex or page.url contains '.json' or page.url contains '/admin/' -%}
+  <url>
+    <loc>{{ page.url | absolute_url }}</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  {%- endunless -%}
+{%- endfor -%}
+{%- for memory in site.memories -%}
+  {%- unless memory.noindex -%}
+  <url>
+    <loc>{{ memory.url | absolute_url }}</loc>
+    {%- if memory.date %}
+    <lastmod>{{ memory.date | date_to_xmlschema }}</lastmod>
+    {%- endif %}
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  {%- endunless -%}
+{%- endfor -%}
+{%- for event in site.events -%}
+  {%- unless event.noindex -%}
+  <url>
+    <loc>{{ event.url | absolute_url }}</loc>
+    {%- if event.date %}
+    <lastmod>{{ event.date | date_to_xmlschema }}</lastmod>
+    {%- endif %}
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  {%- endunless -%}
+{%- endfor -%}
+{%- for person in site.people -%}
+  {%- if person.permission_confirmed and person.noindex != true -%}
+  <url>
+    <loc>{{ person.url | absolute_url }}</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  {%- endif -%}
+{%- endfor -%}
+</urlset>

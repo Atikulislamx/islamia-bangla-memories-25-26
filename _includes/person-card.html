@@ -1,0 +1,33 @@
+{%- comment -%}
+Member profile card.
+
+Parameter: item — a document from the _people collection.
+
+Publication rules enforced here (see CONTENT_GUIDE.md and
+PRIVACY_AND_CONSENT.md):
+  * real profiles are listed only when `permission_confirmed: true`
+  * structural placeholder profiles (sample: true) are listed for layout
+    review and are always shown with a visible “Sample content” badge
+The caller is responsible for filtering with the same rule.
+{%- endcomment -%}
+{%- assign person = include.item -%}
+<article class="card person-card{% if person.sample %} card--sample{% endif %}">
+  {%- if person.photo %}
+  <div class="card__media card__media--portrait">
+    <img src="{% include image-url.html path=person.photo %}"
+         alt="{{ person.photo_alt | default: 'Profile photograph' | escape }}"
+         loading="lazy" decoding="async">
+  </div>
+  {%- endif %}
+  <div class="card__body">
+    <h3 class="card__title">
+      <a class="card__link" href="{{ person.url | relative_url }}"{% if person.lang == 'bn' %} lang="bn"{% endif %}>{{ person.name | default: person.title }}</a>
+    </h3>
+    {%- if person.role %}<p class="card__role">{{ person.role }}</p>{% endif -%}
+    {%- if person.bio %}<p class="card__excerpt">{{ person.bio | strip_html | strip_newlines | truncatewords: 26 }}</p>{% endif %}
+    <p class="card__footer">
+      {%- if person.permission_confirmed %}<span class="card__consent">Consent confirmed</span>{% endif -%}
+      {% include sample-badge.html item=person %}
+    </p>
+  </div>
+</article>

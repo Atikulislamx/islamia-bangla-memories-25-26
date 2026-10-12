@@ -1,0 +1,93 @@
+---
+layout: null
+permalink: /search.json
+sitemap: false
+noindex: true
+---
+{%- comment -%}
+Search index. Only published entries reach this file: Jekyll never writes
+documents or pages with `published: false`, and member profiles additionally
+require recorded consent. Bengali and English text are both included verbatim
+and the browser normalises them; see assets/js/search.js.
+
+Fields: type, title, url, date, category, lang, sample, text
+{%- endcomment -%}
+{%- assign entries = "" -%}
+{%- assign separator = "" -%}
+
+{%- comment -%} ---------- Memories ---------- {%- endcomment -%}
+{%- for memory in site.memories -%}
+  {%- assign memory_category = site.data.categories.memories | where: "id", memory.category | first -%}
+  {%- assign memory_category_label = memory_category.label | default: memory.category -%}
+  {%- capture memory_body -%}{{ memory.content | strip_html | strip_newlines | replace: "**", " " | replace: "##", " " | replace: "*", " " | replace: "[", " " | replace: "]", " " }}{%- endcapture -%}
+  {%- capture memory_text -%}{{ memory.title }} {{ memory.author }} {{ memory.description }} {{ memory.excerpt }} {{ memory_category_label }} {{ memory_body }}{%- endcapture -%}
+  {%- capture entry -%}
+{"type":"memory","title":{{ memory.title | jsonify }},"url":{{ memory.url | relative_url | jsonify }},"date":{{ memory.date | date: "%Y-%m-%d" | jsonify }},"category":{{ memory_category_label | strip | jsonify }},"lang":{{ memory.lang | default: "en" | jsonify }},"sample":{{ memory.sample | default: false }},"text":{{ memory_text | strip_newlines | strip | jsonify }}}
+  {%- endcapture -%}
+  {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+{%- endfor -%}
+
+{%- comment -%} ---------- Events ---------- {%- endcomment -%}
+{%- for event in site.events -%}
+  {%- assign event_category = site.data.categories.events | where: "id", event.category | first -%}
+  {%- assign event_category_label = event_category.label | default: event.category -%}
+  {%- capture event_body -%}{{ event.content | strip_html | strip_newlines | replace: "**", " " | replace: "##", " " | replace: "*", " " }}{%- endcapture -%}
+  {%- capture event_text -%}{{ event.title }} {{ event.location }} {{ event.organiser }} {{ event.description }} {{ event.summary }} {{ event_category_label }} {{ event_body }}{%- endcapture -%}
+  {%- capture entry -%}
+{"type":"event","title":{{ event.title | jsonify }},"url":{{ event.url | relative_url | jsonify }},"date":{{ event.date | date: "%Y-%m-%d" | jsonify }},"category":{{ event_category_label | strip | jsonify }},"lang":{{ event.lang | default: "en" | jsonify }},"sample":{{ event.sample | default: false }},"text":{{ event_text | strip_newlines | strip | jsonify }}}
+  {%- endcapture -%}
+  {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+{%- endfor -%}
+
+{%- comment -%} ---------- Quotations ---------- {%- endcomment -%}
+{%- for quote in site.quotes -%}
+  {%- assign quote_category = site.data.categories.quotes | where: "id", quote.category | first -%}
+  {%- assign quote_category_label = quote_category.label | default: quote.category -%}
+  {%- capture quote_text -%}{{ quote.quote }} {{ quote.author }} {{ quote.source }} {{ quote.translation }} {{ quote_category_label }}{%- endcapture -%}
+  {%- capture entry -%}
+{"type":"quote","title":{{ quote.quote | strip_newlines | strip | truncate: 120 | jsonify }},"url":{{ '/quotes/' | relative_url | jsonify }},"date":{{ quote.date | date: "%Y-%m-%d" | jsonify }},"category":{{ quote_category_label | strip | jsonify }},"lang":{{ quote.lang | default: "en" | jsonify }},"sample":{{ quote.sample | default: false }},"text":{{ quote_text | strip_newlines | strip | jsonify }}}
+  {%- endcapture -%}
+  {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+{%- endfor -%}
+
+{%- comment -%} ---------- Timeline ---------- {%- endcomment -%}
+{%- for item in site.timeline -%}
+  {%- capture timeline_text -%}{{ item.title }} {{ item.period }} {{ item.location }} {{ item.description }} {{ item.content | strip_html }}{%- endcapture -%}
+  {%- capture entry -%}
+{"type":"timeline","title":{{ item.title | jsonify }},"url":{{ '/journey/' | relative_url | jsonify }},"date":{{ item.date | date: "%Y-%m-%d" | jsonify }},"category":{{ item.period | default: "Timeline" | strip | jsonify }},"lang":{{ item.lang | default: "en" | jsonify }},"sample":{{ item.sample | default: false }},"text":{{ timeline_text | strip_newlines | strip | jsonify }}}
+  {%- endcapture -%}
+  {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+{%- endfor -%}
+
+{%- comment -%} ---------- Member profiles (consented only) ---------- {%- endcomment -%}
+{%- for person in site.people -%}
+  {%- assign listable = false -%}
+  {%- if person.permission_confirmed -%}{%- assign listable = true -%}{%- endif -%}
+  {%- if person.sample -%}{%- assign listable = true -%}{%- endif -%}
+  {%- if listable -%}
+    {%- capture person_text -%}{{ person.name }} {{ person.role }} {{ person.bio }} {{ person.content | strip_html }}{%- endcapture -%}
+    {%- capture entry -%}
+{"type":"person","title":{{ person.name | default: person.title | jsonify }},"url":{{ person.url | relative_url | jsonify }},"date":"","category":{{ person.role | default: "Batch member" | strip | jsonify }},"lang":{{ person.lang | default: "en" | jsonify }},"sample":{{ person.sample | default: false }},"text":{{ person_text | strip_newlines | strip | jsonify }}}
+    {%- endcapture -%}
+    {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- comment -%} ---------- Key pages ---------- {%- endcomment -%}
+{%- for item in site.pages -%}
+  {%- if item.search_include and item.noindex != true -%}
+    {%- capture page_text -%}{{ item.title }} {{ item.description }} {{ item.lede }} {{ item.content | strip_html }}{%- endcapture -%}
+    {%- capture entry -%}
+{"type":"page","title":{{ item.title | jsonify }},"url":{{ item.url | relative_url | jsonify }},"date":"","category":"Page","lang":"en","sample":false,"text":{{ page_text | strip_newlines | strip | jsonify }}}
+    {%- endcapture -%}
+    {%- assign entries = entries | append: separator | append: entry -%}
+  {%- assign separator = "," -%}
+  {%- endif -%}
+{%- endfor -%}
+
+[{{ entries }}]

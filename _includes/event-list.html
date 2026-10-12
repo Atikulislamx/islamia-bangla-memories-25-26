@@ -1,0 +1,31 @@
+{%- comment -%}
+Renders a limited list of event cards for the home page.
+
+Parameters:
+  scope — "upcoming" (date >= build time, soonest first) or
+          "past" (date < build time, most recent first)
+  limit — maximum number of cards (default 2)
+
+Nothing is invented: if no verified event matches, the list renders nothing
+and the caller shows an empty state or omits the section.
+{%- endcomment -%}
+{%- assign scope = include.scope | default: "upcoming" -%}
+{%- assign limit = include.limit | default: 2 -%}
+{%- assign now_ts = site.time | date: "%s" | plus: 0 -%}
+{%- assign ordered = site.events | sort: "date" -%}
+{%- if scope == "past" -%}{%- assign ordered = ordered | reverse -%}{%- endif -%}
+{%- assign shown = 0 -%}
+<ul class="card-grid card-grid--events">
+  {%- for event in ordered -%}
+    {%- assign event_ts = event.date | date: "%s" | plus: 0 -%}
+    {%- assign is_future = false -%}
+    {%- if event_ts > now_ts -%}{%- assign is_future = true -%}{%- endif -%}
+    {%- if scope == "upcoming" and is_future and shown < limit -%}
+      {%- assign shown = shown | plus: 1 -%}
+      <li class="card-grid__item">{% include event-card.html item=event %}</li>
+    {%- elsif scope == "past" and is_future == false and shown < limit -%}
+      {%- assign shown = shown | plus: 1 -%}
+      <li class="card-grid__item">{% include event-card.html item=event %}</li>
+    {%- endif -%}
+  {%- endfor -%}
+</ul>

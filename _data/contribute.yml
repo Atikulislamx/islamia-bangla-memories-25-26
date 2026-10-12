@@ -1,0 +1,68 @@
+# ---------------------------------------------------------------------------
+# Contribution workflow shown on /contribute/ and summarised on /about/
+# ---------------------------------------------------------------------------
+# IMPORTANT — no contact address has been supplied by the project owner, so
+# this file contains an explicit placeholder instead of an invented email
+# address. Replace `contact.value` and set `contact.available: true` when a
+# real inbox or form endpoint exists. Never invent contact details.
+# ---------------------------------------------------------------------------
+status:
+  automated_submissions: false
+  automated_message: >-
+    Submissions are not automated yet. This page explains what the archive
+    accepts, how a submission is reviewed and how consent is handled. There is
+    no online form on this website, and no data is collected or stored by the
+    website itself.
+
+contact:
+  available: false
+  label: "Contribution contact"
+  value: "Not configured yet (placeholder)"
+  note: >-
+    No contact address has been published for this archive. Add one in
+    _data/contribute.yml once the batch or department agrees on a single
+    channel that is safe to publish publicly.
+
+review_steps:
+  - title: "1. Read the guidance"
+    body: >-
+      Check that the memory, event, quotation or photograph you want to share
+      is yours to share, that everyone identifiable in a photograph has agreed
+      to publication, and that you are not sending anything private.
+  - title: "2. Prepare the material"
+    body: >-
+      Memories and reflections: a title, a short description, the full text in
+      English, Bengali or both, and an optional date. Photographs: the original
+      file, a short caption, and an accessible description of what the image
+      shows. Quotations: the exact words, the author, and the source if known.
+  - title: "3. Submit through the agreed channel"
+    body: >-
+      The batch and the developer agree on one submission channel. Until that
+      channel is announced, please do not send material: nothing sent today can
+      be acknowledged or stored. The placeholder below will be replaced with
+      the real instructions in _data/contribute.yml.
+  - title: "4. Editorial review"
+    body: >-
+      A submission is checked for accuracy, consent, tone, copyright and for
+      personal information that should stay private. Content that cannot be
+      verified, or that identifies someone who has not agreed, is not
+      published.
+  - title: "5. Publication"
+    body: >-
+      Approved material is added to the repository by the maintainer, then
+      published to the website. Corrections and removal requests follow the
+      process described in the Privacy Policy.
+
+content_types:
+  - title: "Memories"
+    body: "Short or long first-person recollections. Bengali and English are both welcome."
+    url: "/memories/"
+  - title: "Events"
+    body: "Programmes, seminars, cultural events or informal gatherings of the batch."
+    url: "/events/"
+  - title: "Quotations"
+    body: "Public-domain literary quotations, or your own short reflections."
+    url: "/quotes/"
+  - title: "Photographs"
+    body: "Permission-cleared images with a caption and an accessible description."
+    url: "/gallery/"

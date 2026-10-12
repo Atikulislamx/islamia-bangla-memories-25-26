@@ -1,0 +1,20 @@
+{%- comment -%}
+Resolves an image path into a URL that keeps working under the GitHub Pages
+project baseurl. Handles four cases:
+
+  1. absolute URLs            https://example.org/a.jpg   -> unchanged
+  2. paths that already carry the site baseurl            -> unchanged
+     (Decap CMS writes these when public_folder includes the baseurl)
+  3. root-relative paths      /assets/img/a.jpg           -> baseurl prepended
+  4. relative paths           assets/img/a.jpg            -> relative_url
+
+Usage:  {% include image-url.html path=page.image %}
+{%- endcomment -%}
+{%- assign raw = include.path | default: "" | strip -%}
+{%- if raw == "" -%}
+{%- elsif raw contains "://" -%}{{ raw }}
+{%- elsif raw contains site.baseurl -%}{{ raw }}
+{%- else -%}
+{%- assign lead = raw | slice: 0 -%}
+{%- if lead == "/" -%}{{ raw | prepend: site.baseurl }}{%- else -%}{{ raw | relative_url }}{%- endif -%}
+{%- endif -%}

@@ -1,0 +1,54 @@
+{%- comment -%}
+Event card used by the home page and the Events archive.
+
+Parameter: item — a document from the _events collection.
+Upcoming / past status is derived from the event date at build time, so a
+genuinely future event is labelled "Upcoming" and everything else "Past".
+{%- endcomment -%}
+{%- assign event = include.item -%}
+{%- assign event_ts = event.date | date: "%s" | plus: 0 -%}
+{%- assign now_ts = site.time | date: "%s" | plus: 0 -%}
+{%- assign is_upcoming = false -%}
+{%- if event_ts > now_ts -%}{%- assign is_upcoming = true -%}{%- endif -%}
+{%- assign category_label = "" -%}
+{%- if event.category -%}
+  {%- assign category_match = site.data.categories.events | where: "id", event.category | first -%}
+  {%- assign category_label = category_match.label | default: event.category -%}
+{%- endif -%}
+{%- assign summary = event.summary | default: event.description -%}
+{%- if summary == nil or summary == "" -%}
+  {%- assign summary = event.content | strip_html | truncatewords: 28 -%}
+{%- endif -%}
+<article class="card event-card{% if event.sample %} card--sample{% endif %}"
+         data-filter-item
+         data-cat="{{ event.category | default: 'uncategorised' }}"
+         data-status="{% if is_upcoming %}upcoming{% else %}past{% endif %}"
+         data-sample="{{ event.sample | default: false }}"
+         data-search="{{ event.title | append: ' ' | append: event.location | append: ' ' | append: category_label | append: ' ' | append: summary | downcase | escape }}">
+  {%- if event.image %}
+  <div class="card__media">
+    <img src="{% include image-url.html path=event.image %}"
+         alt="{{ event.image_alt | default: '' | escape }}"
+         loading="lazy" decoding="async">
+  </div>
+  {%- endif %}
+  <div class="card__body">
+    <p class="card__meta">
+      <span class="badge badge--status{% if is_upcoming %} badge--upcoming{% endif %}">{% if is_upcoming %}Upcoming{% else %}Past{% endif %}</span>
+      {%- if category_label != "" %}<span class="card__category">{{ category_label }}</span>{% endif %}
+    </p>
+    <h3 class="card__title">
+      <a class="card__link" href="{{ event.url | relative_url }}"{% if event.lang == 'bn' %} lang="bn"{% endif %}>{{ event.title }}</a>
+    </h3>
+    <p class="card__meta card__meta--detail">
+      {%- if event.date %}<time datetime="{{ event.date | date: '%Y-%m-%d' }}">{{ event.date | date: "%-d %B %Y" }}</time>{% endif -%}
+      {%- if event.time %} <span aria-hidden="true">·</span> <span class="card__time">{{ event.time }}</span>{% endif -%}
+      {%- if event.location %} <span aria-hidden="true">·</span> <span class="card__location">{{ event.location }}</span>{% endif -%}
+    </p>
+    <p class="card__excerpt">{{ summary | strip_html | strip_newlines | truncatewords: 28 }}</p>
+    <p class="card__footer">
+      {%- if event.organiser %}<span class="card__author">{{ event.organiser }}</span>{% endif -%}
+      {% include sample-badge.html item=event %}
+    </p>
+  </div>
+</article>

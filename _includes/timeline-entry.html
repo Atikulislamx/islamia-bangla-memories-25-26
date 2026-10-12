@@ -1,0 +1,27 @@
+{%- comment -%}
+One entry on the Our Journey timeline.
+
+Parameter: item — a document from the _timeline collection.
+Fields: title, date (optional), period (optional human-readable label),
+description, location (optional), image (optional), lang, sample.
+{%- endcomment -%}
+{%- assign entry = include.item -%}
+<li class="timeline__item{% if entry.sample %} timeline__item--sample{% endif %}">
+  <div class="timeline__marker" aria-hidden="true"></div>
+  <div class="timeline__content">
+    <p class="timeline__period">
+      {%- if entry.period -%}
+        {{ entry.period }}
+      {%- elsif entry.date -%}
+        <time datetime="{{ entry.date | date: '%Y-%m-%d' }}">{{ entry.date | date: "%B %Y" }}</time>
+      {%- else -%}
+        Undated
+      {%- endif -%}
+    </p>
+    <h3 class="timeline__title"{% if entry.lang == 'bn' %} lang="bn"{% endif %}>{{ entry.title }}</h3>
+    {%- if entry.location %}<p class="timeline__location">{{ entry.location }}</p>{% endif -%}
+    {%- if entry.description %}<p class="timeline__description"{% if entry.lang == 'bn' %} lang="bn"{% endif %}>{{ entry.description | strip_newlines | strip }}</p>{% endif -%}
+    {%- if entry.image %}{% include figure.html image=entry.image alt=entry.image_alt caption=entry.caption lang=entry.lang extra_class="timeline__figure" %}{% endif -%}
+    <p class="timeline__footer">{% include sample-badge.html item=entry %}</p>
+  </div>
+</li>

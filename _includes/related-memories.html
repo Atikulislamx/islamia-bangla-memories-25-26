@@ -1,0 +1,35 @@
+{%- comment -%}
+Related memories list for entry pages.
+
+Parameters:
+  exclude_url — url of the current page (never listed)
+  category    — optional category id; only memories in the same category are
+                listed when it is supplied
+  limit       — maximum number of items (default 3)
+
+Written with an explicit counter instead of array filters so that it behaves
+identically on the GitHub Pages Jekyll build and in local previews.
+{%- endcomment -%}
+{%- assign limit = include.limit | default: 3 -%}
+{%- assign ordered = site.memories | sort: "date" | reverse -%}
+{%- assign shown = 0 -%}
+{%- capture items -%}
+{%- for memory in ordered -%}
+  {%- if shown < limit and memory.url != include.exclude_url -%}
+    {%- if include.category == nil or include.category == "" or memory.category == include.category -%}
+      {%- assign shown = shown | plus: 1 -%}
+      <li class="related-list__item">
+        <a href="{{ memory.url | relative_url }}"{% if memory.lang == 'bn' %} lang="bn"{% endif %}>{{ memory.title }}</a>
+        {%- if memory.date %} <time datetime="{{ memory.date | date: '%Y-%m-%d' }}">{{ memory.date | date: "%-d %B %Y" }}</time>{% endif %}
+      </li>
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- endcapture -%}
+{%- assign trimmed = items | strip -%}
+{%- if trimmed != "" -%}
+<section class="related-section" aria-labelledby="related-memories-{{ include.section_id | default: 'title' }}">
+  <h2 class="related-section__title" id="related-memories-{{ include.section_id | default: 'title' }}">Related memories</h2>
+  <ul class="related-list">{{ items }}</ul>
+</section>
+{%- endif -%}

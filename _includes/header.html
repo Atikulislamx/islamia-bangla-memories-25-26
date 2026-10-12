@@ -1,0 +1,50 @@
+{%- comment -%}
+Responsive site header: brand, primary navigation (English labels from
+_data/navigation.yml), search shortcut and an accessible mobile menu toggle.
+The mobile panel is opened and closed by assets/js/main.js; without JavaScript
+the navigation stays visible and usable as a plain list.
+{%- endcomment -%}
+<header class="site-header" data-site-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <span class="brand__mark" aria-hidden="true">
+        {% include icon-mark.html %}
+      </span>
+      <span class="brand__text">
+        <span class="brand__title">{{ site.institution.department }}</span>
+        <span class="brand__subtitle">{{ site.institution.name }} <span aria-hidden="true">·</span> {{ site.institution.batch }}</span>
+      </span>
+    </a>
+
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+      <span class="nav-toggle__icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="nav-toggle__label" data-nav-toggle-label>Menu</span>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="Primary" data-site-nav>
+      <ul class="site-nav__list">
+        {%- for item in site.data.navigation.main %}
+        {%- assign is_current = false -%}
+        {%- if page.url == item.url -%}{%- assign is_current = true -%}{%- endif -%}
+        {%- if item.url != "/" and page.url contains item.url -%}{%- assign is_current = true -%}{%- endif %}
+        <li class="site-nav__item">
+          <a class="site-nav__link{% if is_current %} is-current{% endif %}"
+             href="{{ item.url | relative_url }}"
+             {%- if is_current %} aria-current="page"{% endif %}>{{ item.label }}</a>
+        </li>
+        {%- endfor %}
+      </ul>
+      <ul class="site-nav__utility">
+        <li>
+          <a class="site-nav__utility-link" href="{{ '/search/' | relative_url }}"{% if page.url == '/search/' %} aria-current="page"{% endif %}>
+            <span class="site-nav__utility-icon" aria-hidden="true">{% include icon-search.html %}</span>
+            Search
+          </a>
+        </li>
+        <li>
+          <a class="site-nav__utility-link site-nav__utility-link--strong" href="{{ '/contribute/' | relative_url }}"{% if page.url == '/contribute/' %} aria-current="page"{% endif %}>Contribute a Memory</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

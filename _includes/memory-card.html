@@ -1,0 +1,45 @@
+{%- comment -%}
+Memory card used by the home page and the Memories archive.
+
+Parameter: item — a document from the _memories collection.
+Expected detail pages: every card links to the collection permalink
+/memories/:slug/ (see _config.yml).
+{%- endcomment -%}
+{%- assign memory = include.item -%}
+{%- assign category_label = "" -%}
+{%- if memory.category -%}
+  {%- assign category_match = site.data.categories.memories | where: "id", memory.category | first -%}
+  {%- assign category_label = category_match.label | default: memory.category -%}
+{%- endif -%}
+{%- assign excerpt_text = memory.excerpt | default: memory.description -%}
+{%- if excerpt_text == nil or excerpt_text == "" -%}
+  {%- assign excerpt_text = memory.content | strip_html | truncatewords: 30 -%}
+{%- endif -%}
+<article class="card memory-card{% if memory.sample %} card--sample{% endif %}"
+         data-filter-item
+         data-cat="{{ memory.category | default: 'uncategorised' }}"
+         data-lang="{{ memory.lang | default: 'en' }}"
+         data-sample="{{ memory.sample | default: false }}"
+         data-search="{{ memory.title | append: ' ' | append: memory.author | append: ' ' | append: category_label | append: ' ' | append: excerpt_text | downcase | escape }}">
+  {%- if memory.image %}
+  <div class="card__media">
+    <img src="{% include image-url.html path=memory.image %}"
+         alt="{{ memory.image_alt | default: '' | escape }}"
+         loading="lazy" decoding="async">
+  </div>
+  {%- endif %}
+  <div class="card__body">
+    <p class="card__meta">
+      {%- if category_label != "" %}<span class="card__category">{{ category_label }}</span>{% endif -%}
+      {%- if memory.date %}<time class="card__date" datetime="{{ memory.date | date: '%Y-%m-%d' }}">{{ memory.date | date: "%-d %B %Y" }}</time>{% endif -%}
+    </p>
+    <h3 class="card__title">
+      <a class="card__link" href="{{ memory.url | relative_url }}"{% if memory.lang == 'bn' %} lang="bn"{% endif %}>{{ memory.title }}</a>
+    </h3>
+    <p class="card__excerpt"{% if memory.lang == 'bn' %} lang="bn"{% endif %}>{{ excerpt_text | strip_html | strip_newlines | truncatewords: 30 }}</p>
+    <p class="card__footer">
+      {%- if memory.author %}<span class="card__author">Contributed by {{ memory.author }}</span>{% endif -%}
+      {% include sample-badge.html item=memory %}
+    </p>
+  </div>
+</article>

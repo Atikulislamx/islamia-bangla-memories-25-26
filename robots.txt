@@ -1,0 +1,13 @@
+---
+layout: null
+permalink: /robots.txt
+sitemap: false
+noindex: false
+---
+User-agent: *
+Allow: /
+
+# The content management panel is a maintenance tool, never an index target.
+Disallow: /admin/
+
+Sitemap: {{ '/sitemap.xml' | absolute_url }}

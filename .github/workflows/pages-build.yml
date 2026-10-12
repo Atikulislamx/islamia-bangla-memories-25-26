@@ -1,0 +1,230 @@
+# ===========================================================================
+# GitHub Pages build check
+# ===========================================================================
+# GitHub Pages itself keeps building from `main` with its own Jekyll
+# environment. This workflow does NOT deploy anything: it runs the same Jekyll
+# build for every change, so a broken template, a missing include or invalid
+# front matter fails here instead of on the live website.
+#
+# It deliberately uses the `github-pages` gem, which pins the same Jekyll
+# version, Markdown engine and plugin set that GitHub Pages uses.
+# ===========================================================================
+name: Build check (GitHub Pages)
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  jekyll-build:
+    name: Jekyll build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Install the GitHub Pages gem set
+        run: gem install github-pages --no-document
+
+      - name: Build the site exactly as GitHub Pages does
+        run: jekyll build --trace
+        env:
+          JEKYLL_ENV: production
+
+      - name: Fail if the build produced no output
+        run: |
+          test -f _site/index.html || { echo "::error::_site/index.html was not generated"; exit 1; }
+          test -f _site/search.json || { echo "::error::_site/search.json was not generated"; exit 1; }
+          test -f _site/sitemap.xml || { echo "::error::_site/sitemap.xml was not generated"; exit 1; }
+          test -f _site/robots.txt || { echo "::error::_site/robots.txt was not generated"; exit 1; }
+
+      - name: Check required pages and the developer credit
+        run: |
+          set -e
+          required="index.html memories/index.html events/index.html quotes/index.html \
+                    gallery/index.html journey/index.html about/index.html \
+                    privacy/index.html search/index.html contribute/index.html \
+                    404.html people/index.html"
+          for page in $required; do
+            test -f "_site/$page" || { echo "::error::missing page _site/$page"; exit 1; }
+          done
+
+          missing=0
+          while IFS= read -r file; do
+            if ! grep -q "Designed &amp; Developed by Atikul Islam Rabbi" "$file"; then
+              echo "::error file=$file::developer credit missing"
+              missing=1
+            fi
+            if ! grep -q "Student, Department of Bengali" "$file"; then
+              echo "::error file=$file::developer role missing"
+              missing=1
+            fi
+          done < <(find _site -name '*.html' -not -path '_site/admin/*')
+          exit $missing
+
+      - name: Check for unrendered Liquid and invalid internal paths
+        run: |
+          set -e
+          if grep -rl '{%' _site --include='*.html' --include='*.json' --include='*.xml' --include='*.txt'; then
+            echo "::error::unrendered Liquid markup found in the build output"
+            exit 1
+          fi
+
+          # Root-relative paths would 404 on a GitHub Pages project URL, because
+          # the site is served from /islamia-bangla-memories-25-26/.
+          bad=$(grep -rn 'src="/assets\|href="/assets\|href="/memories\|href="/events\|href="/gallery\|href="/about\|href="/search\|href="/privacy\|href="/contribute\|href="/journey\|href="/quotes\|href="/people' \
+                  _site --include='*.html' | grep -v '/islamia-bangla-memories-25-26' || true)
+          if [ -n "$bad" ]; then
+            echo "$bad" | head -20
+            echo "::error::found baseurl-less internal paths (they break on GitHub Pages project URLs)"
+            exit 1
+          fi
+
+          if ! grep -q 'Disallow: /admin/' _site/robots.txt; then
+            echo "::error::robots.txt does not disallow /admin/ (or still contains front matter)"
+            exit 1
+          fi
+
+      - name: Validate the search index
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          data = json.load(open('_site/search.json', encoding='utf-8'))
+          if not data:
+              sys.exit('search.json is empty')
+          required = {'type', 'title', 'url', 'text'}
+          for i, entry in enumerate(data):
+              missing = required - entry.keys()
+              if missing:
+                  sys.exit(f'search.json[{i}] missing {sorted(missing)}')
+              if not entry['url'].startswith('/islamia-bangla-memories-25-26/'):
+                  sys.exit(f"search.json[{i}] url is not baseurl-prefixed: {entry['url']}")
+          print(f'search.json valid: {len(data)} entries')
+          PY
+
+      - name: Validate the sitemap
+        run: |
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET, sys
+          tree = ET.parse('_site/sitemap.xml')
+          ns = {'s': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          locs = [e.text for e in tree.getroot().findall('s:url/s:loc', ns)]
+          if not locs:
+              sys.exit('sitemap has no entries')
+          bad = [u for u in locs if not u.startswith('https://atikulislamx.github.io/islamia-bangla-memories-25-26')]
+          if bad:
+              sys.exit(f'sitemap contains URLs outside the project path: {bad[:3]}')
+          if any('/search.json' in u or u.endswith('/404.html') for u in locs):
+              sys.exit('sitemap lists a page that should be excluded')
+          print(f'sitemap valid: {len(locs)} URLs')
+          PY
+
+      - name: Validate content front matter
+        run: |
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+          import yaml
+
+          COLLECTIONS = {
+              '_memories': {'requires': ['title', 'date'], 'layouts': ['memory']},
+              '_events':   {'requires': ['title', 'date'], 'layouts': ['event']},
+              '_quotes':   {'requires': ['quote'], 'layouts': []},
+              '_timeline': {'requires': ['title', 'date'], 'layouts': []},
+              '_people':   {'requires': ['name'], 'layouts': ['person']},
+          }
+
+          errors = []
+          checked = 0
+          for folder, rules in COLLECTIONS.items():
+              for path in sorted(Path(folder).glob('*.md')):
+                  text = path.read_text(encoding='utf-8')
+                  if not text.startswith('---'):
+                      errors.append(f'{path}: missing YAML front matter')
+                      continue
+                  end = text.find('\n---', 3)
+                  if end == -1:
+                      errors.append(f'{path}: front matter is not closed with ---')
+                      continue
+                  try:
+                      fm = yaml.safe_load(text[3:end]) or {}
+                  except yaml.YAMLError as exc:
+                      errors.append(f'{path}: invalid YAML front matter ({exc})')
+                      continue
+                  checked += 1
+                  for field in rules['requires']:
+                      if not fm.get(field):
+                          errors.append(f'{path}: required field "{field}" is missing or empty')
+                  if rules['layouts'] and fm.get('layout') not in rules['layouts']:
+                      errors.append(f'{path}: layout must be one of {rules["layouts"]}')
+                  # Accessibility guard: an image without a description is not publishable.
+                  if fm.get('image') and not fm.get('image_alt'):
+                      errors.append(f'{path}: "image" is set without "image_alt"')
+                  for item in fm.get('gallery') or []:
+                      if isinstance(item, dict) and item.get('image') and not item.get('alt'):
+                          errors.append(f'{path}: gallery image without "alt"')
+                  # Placeholders must be visibly marked.
+                  if path.name.startswith('example-') and not fm.get('sample'):
+                      errors.append(f'{path}: placeholder files (example-*) must set "sample: true"')
+
+          for path in sorted(Path('_data/gallery.yml').parent.glob('gallery.yml')):
+              data = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+              for index, item in enumerate(data.get('items') or []):
+                  if not item.get('alt'):
+                      errors.append(f'{path}: items[{index}] is missing "alt"')
+
+          for error in errors:
+              print(f'::error::{error}')
+          if errors:
+              sys.exit(1)
+          print(f'front matter valid: {checked} content files')
+          PY
+
+      - name: Check the CMS configuration matches the content structure
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+          try:
+              import yaml
+          except ImportError:
+              print('PyYAML unavailable, skipping CMS cross-check')
+              sys.exit(0)
+
+          config = yaml.safe_load(Path('admin/config.yml').read_text(encoding='utf-8'))
+          errors = []
+          if 'backend' not in config or not config['backend'].get('repo'):
+              errors.append('admin/config.yml: backend.repo is missing (the turbo-github backend needs it as a fallback)')
+          for collection in config.get('collections', []):
+              folder = collection.get('folder')
+              if folder and not Path(folder).is_dir():
+                  errors.append(f'admin/config.yml: collection "{collection["name"]}" points at a folder that does not exist: {folder}')
+              if folder and collection.get('create') is False:
+                  continue
+          media = config.get('media_folder')
+          if media and not Path(media).is_dir():
+              errors.append(f'admin/config.yml: media_folder does not exist: {media}')
+          # Collection names must match the Jekyll collections in _config.yml
+          site = yaml.safe_load(Path('_config.yml').read_text(encoding='utf-8'))
+          jekyll_collections = set((site.get('collections') or {}).keys())
+          cms_collections = {c['name'] for c in config.get('collections', [])}
+          unknown = cms_collections - jekyll_collections
+          if unknown:
+              errors.append(f'admin/config.yml: collections not declared in _config.yml: {sorted(unknown)}')
+          if errors:
+              for error in errors:
+                  print(f'::error::{error}')
+              sys.exit(1)
+          print(f'CMS config valid: {len(cms_collections)} collections cross-checked against _config.yml')
+          PY

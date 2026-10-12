@@ -1,0 +1,39 @@
+{%- comment -%}
+Responsive photo gallery grid.
+
+Each item is a real link to the full-size image, so the gallery still works
+without JavaScript; assets/js/main.js upgrades these links into an accessible
+lightbox (keyboard navigation, focus handling, Esc to close).
+
+Reads _data/gallery.yml. Optional parameter: limit (number of items).
+{%- endcomment -%}
+{%- assign items = site.data.gallery.items -%}
+{%- if include.limit -%}{%- assign items = items | slice: 0, include.limit -%}{%- endif -%}
+<ul class="gallery" data-gallery>
+  {%- for item in items %}
+  {%- capture image_src %}{% include image-url.html path=item.image %}{% endcapture -%}
+  <li class="gallery__item">
+    <figure class="gallery__figure">
+      <a class="gallery__link"
+         href="{{ image_src | strip }}"
+         data-lightbox
+         data-lightbox-src="{{ image_src | strip }}"
+         data-lightbox-caption="{{ item.caption | default: item.alt | escape }}"
+         data-lightbox-alt="{{ item.alt | escape }}"
+         aria-label="View larger image: {{ item.caption | default: item.alt | escape }}">
+        <img class="gallery__image"
+             src="{{ image_src | strip }}"
+             alt="{{ item.alt | escape }}"
+             loading="lazy"
+             decoding="async">
+      </a>
+      <figcaption class="gallery__caption">
+        <span class="gallery__caption-text"{% if item.lang %} lang="{{ item.lang }}"{% endif %}>{{ item.caption }}</span>
+        {%- if item.date %}<time class="gallery__date" datetime="{{ item.date | date: '%Y-%m-%d' }}">{{ item.date | date: "%-d %B %Y" }}</time>{% endif -%}
+        {%- if item.event %}<span class="gallery__event">{{ item.event }}</span>{% endif -%}
+        {%- if item.credit %}<span class="gallery__credit">{{ item.credit }}</span>{% endif -%}
+      </figcaption>
+    </figure>
+  </li>
+  {%- endfor %}
+</ul>

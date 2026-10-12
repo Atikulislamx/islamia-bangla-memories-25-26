@@ -1,0 +1,85 @@
+{%- comment -%}
+Document head: encoding, responsive viewport, unique titles, meta
+descriptions, canonical URLs, Open Graph / Twitter metadata, icons, font
+preloads and the site stylesheet. All URLs are baseurl-aware.
+{%- endcomment -%}
+{%- assign page_title_text = page.title | default: site.title -%}
+{%- if page.title and page.title != site.title -%}
+  {%- capture document_title -%}{{ page_title_text }} {{ site.title_separator }} {{ site.short_title }}{%- endcapture -%}
+{%- else -%}
+  {%- capture document_title -%}{{ site.title }} {{ site.title_separator }} {{ site.tagline }}{%- endcapture -%}
+{%- endif -%}
+{%- comment -%}
+Meta description: the page's own description first, then a generated summary
+from the entry itself (excerpt, short summary, biography or page lede), and only
+then the site-wide description — so no two pages share the same description
+unless they genuinely have no content of their own.
+{%- endcomment -%}
+{%- assign description_source = page.description | default: page.excerpt | default: page.summary | default: page.bio | default: page.lede | default: site.description -%}
+{%- assign meta_description = description_source | strip_html | strip_newlines | strip | truncate: 200 -%}
+{%- assign meta_image_raw = page.image | default: site.social_image -%}
+{%- capture meta_image -%}{% include image-url.html path=meta_image_raw %}{%- endcapture -%}
+{%- assign meta_image_alt = page.image_alt | default: site.social_image_alt -%}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ document_title | strip | escape }}</title>
+<meta name="description" content="{{ meta_description | escape }}">
+{% if page.noindex %}<meta name="robots" content="noindex, follow">
+{% else %}<meta name="robots" content="index, follow, max-image-preview:large">
+{% endif %}
+<link rel="canonical" href="{{ page.url | absolute_url }}">
+<meta name="author" content="{{ site.developer.name }}">
+<meta name="theme-color" content="#123a2e">
+<meta name="color-scheme" content="light">
+
+<!-- Open Graph -->
+<meta property="og:type" content="{% if page.layout == 'memory' or page.layout == 'event' %}article{% else %}website{% endif %}">
+<meta property="og:site_name" content="{{ site.short_title | escape }}">
+<meta property="og:title" content="{{ page_title_text | strip | escape }}">
+<meta property="og:description" content="{{ meta_description | escape }}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta property="og:image" content="{{ meta_image | strip }}">
+<meta property="og:image:alt" content="{{ meta_image_alt | strip_newlines | strip | escape }}">
+<meta property="og:locale" content="en_US">
+{%- if page.lang == "bn" or page.layout == "memory" or page.layout == "event" %}
+<meta property="og:locale:alternate" content="bn_BD">
+{%- endif %}
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ page_title_text | strip | escape }}">
+<meta name="twitter:description" content="{{ meta_description | escape }}">
+<meta name="twitter:image" content="{{ meta_image | strip }}">
+<meta name="twitter:image:alt" content="{{ meta_image_alt | strip_newlines | strip | escape }}">
+
+<!-- Icons -->
+<link rel="icon" href="{{ '/assets/img/favicon.svg' | relative_url }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ '/assets/img/apple-touch-icon.png' | relative_url }}">
+
+<!-- Fonts: self-hosted, no third-party requests -->
+<link rel="preload" href="{{ '/assets/fonts/inter-latin-400.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ '/assets/fonts/noto-sans-bengali-bengali-400.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+
+<!-- Styles -->
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+
+<script>document.documentElement.classList.add('has-js');</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ site.title | jsonify }},
+  "alternateName": {{ site.short_title | jsonify }},
+  "url": {{ '/' | absolute_url | jsonify }},
+  "description": {{ site.description | strip_newlines | strip | jsonify }},
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "creator": {
+    "@type": "Person",
+    "name": {{ site.developer.name | jsonify }},
+    "jobTitle": {{ site.developer.role | jsonify }},
+    "url": {{ site.developer.github_url | jsonify }}
+  }
+}
+</script>

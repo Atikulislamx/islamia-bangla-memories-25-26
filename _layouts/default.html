@@ -1,0 +1,21 @@
+{%- comment -%}
+Base document. Every page on the website renders through this layout, which
+means every public page (including collection detail pages, the search page
+and the custom 404 page) receives the shared header, the shared footer and the
+developer credit it contains.
+{%- endcomment -%}
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+  <head>
+    {% include head.html %}
+  </head>
+  <body class="page page--{{ page.layout | default: 'default' }}{% if page.body_class %} {{ page.body_class }}{% endif %}">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    {% include header.html %}
+    <main id="main-content" class="site-main" tabindex="-1">
+      {{ content }}
+    </main>
+    {% include footer.html %}
+    {% include scripts.html %}
+  </body>
+</html>

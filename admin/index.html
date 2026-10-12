@@ -1,11 +1,86 @@
-<!doctype html>
-<html lang="bn">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>অ্যাডমিন প্যানেল | বাংলা বিভাগ ২০২৫–২৬</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Content Manager · Bengali Department Memory Archive</title>
+    <meta name="description" content="Maintenance-only content manager for the Bengali Department digital memory archive.">
+    <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+    <style>
+      :root { color-scheme: light; }
+      body {
+        margin: 0;
+        background: #faf7f1;
+        color: #2b3138;
+        font: 16px/1.6 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      #cms-preflight-notice { padding: 1.5rem; }
+      .turbo-preflight__box {
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 1.25rem 1.5rem;
+        background: #fffdf9;
+        border: 1px solid #dcc08a;
+        border-left: 4px solid #b9812a;
+        border-radius: 12px;
+      }
+      .turbo-preflight__box h2 { margin: 0 0 0.5rem; font-size: 1.25rem; color: #14171a; }
+      .turbo-preflight__box ol { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+      .turbo-preflight__box li { margin-bottom: 0.35rem; }
+      .turbo-preflight__note { margin: 0; font-size: 0.875rem; color: #575f68; }
+      .cms-noscript {
+        max-width: 60rem;
+        margin: 2rem auto;
+        padding: 1.25rem 1.5rem;
+        background: #fffdf9;
+        border: 1px solid #e5dcce;
+        border-radius: 12px;
+      }
+    </style>
   </head>
   <body>
-    <script src="https://cdn.jsdelivr.net/npm/decap-cms@beta/dist/decap-cms.js"></script>
+    <!--
+      Decap CMS admin panel — maintenance tool, not part of the public website.
+
+      It is excluded from search engines (noindex, and Disallow: /admin/ in
+      robots.txt) and it is not linked from any public page.
+
+      Authentication: the turbo-github backend authenticates editors through the
+      Decap Turbo dashboard. Authentication has NOT been verified end to end for
+      this project (see CMS_SETUP.md). No credentials are stored in this file.
+    -->
+    <noscript>
+      <div class="cms-noscript">
+        <h1>JavaScript is required</h1>
+        <p>
+          The content manager is a client-side application. Enable JavaScript to
+          use it. The public website itself works without JavaScript.
+        </p>
+      </div>
+    </noscript>
+
+    <!-- Populated by turbo-preflight.js only when the CMS setup is incomplete. -->
+    <div id="cms-preflight-notice" hidden></div>
+
+    <script src="turbo-preflight.js"></script>
+    <script>
+      // One unauthenticated request against the public Turbo config endpoint to
+      // turn a cryptic backend error into an actionable message. Safe to fail:
+      // if the request is blocked, the notice simply stays hidden.
+      document.addEventListener("DOMContentLoaded", function () {
+        if (!window.TurboPreflight) {
+          return;
+        }
+        window.TurboPreflight.init({
+          siteId: "50710218-f620-46cd-8ee7-f56ff252e14d",
+          fallbackRepo: "Atikulislamx/islamia-bangla-memories-25-26"
+        });
+      });
+    </script>
+
+    <!-- Decap CMS (pin the version: beta backends can change between releases).
+         Upgrade deliberately, then re-test the admin panel and the collections. -->
+    <script src="https://cdn.jsdelivr.net/npm/decap-cms@3.17.0-beta.3/dist/decap-cms.js"></script>
   </body>
 </html>

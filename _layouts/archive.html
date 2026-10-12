@@ -1,0 +1,21 @@
+---
+layout: default
+---
+{%- comment -%}
+Layout for archive pages (Memories, Events, Photo Gallery, Our Journey,
+Quotes, Batch Members). The page header is shared; each archive supplies its
+own sections and container markup inside the page content.
+{%- endcomment -%}
+<div class="container">
+  {% include breadcrumbs.html parent_title=page.parent_title parent_url=page.parent_url %}
+
+  <header class="page-header page-header--archive">
+    {%- if page.eyebrow %}<p class="page-header__eyebrow">{{ page.eyebrow }}</p>{%- endif %}
+    <h1 class="page-header__title">{{ page.title }}</h1>
+    {%- if page.lede %}<p class="page-header__lede">{{ page.lede | strip_newlines | strip }}</p>{%- endif %}
+    {%- if page.lede_bn %}<p class="page-header__lede page-header__lede--bn" lang="bn">{{ page.lede_bn | strip_newlines | strip }}</p>{%- endif %}
+    {%- if page.archive_note %}<p class="page-header__note">{{ page.archive_note | strip_newlines | strip }}</p>{%- endif %}
+  </header>
+</div>
+
+{{ content }}

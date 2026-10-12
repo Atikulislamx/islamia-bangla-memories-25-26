@@ -1,0 +1,54 @@
+---
+layout: archive
+title: "Memories"
+eyebrow: "Archive"
+lede: >-
+  Every memory published by the batch, in English or Bengali. Each entry has
+  its own page with the full text, an optional photograph and links to related
+  memories and events.
+archive_note: >-
+  Entries are published only after review. Nothing in this archive has been
+  invented to fill the page: what is not yet contributed is simply not here.
+permalink: /memories/
+parent_title: "Home"
+parent_url: "/"
+description: >-
+  The memory archive of the Department of Bengali, Honours Batch 2025–26 —
+  classroom days, campus life, literary activities and personal reflections.
+search_include: true
+---
+{%- assign ordered_memories = site.memories | sort: "date" | reverse -%}
+
+<section class="section" aria-labelledby="memories-list-title">
+  <div class="container">
+    {%- if site.sample_content %}
+    {% include notice.html variant="sample" title="Sample content notice" body=site.sample_notice %}
+    {%- endif %}
+
+    <h2 class="section-title section-title--quiet" id="memories-list-title">
+      {%- if ordered_memories.size > 0 -%}
+        {{ ordered_memories.size }} {% if ordered_memories.size == 1 %}memory{% else %}memories{% endif %} published
+      {%- else -%}
+        Memory archive
+      {%- endif -%}
+    </h2>
+
+    {% include archive-filters.html group="memories" languages=true legend="Filter memories" %}
+
+    {%- if ordered_memories.size > 0 %}
+    <ul class="card-grid card-grid--memories">
+      {%- for memory in ordered_memories %}
+      <li class="card-grid__item">{% include memory-card.html item=memory %}</li>
+      {%- endfor %}
+    </ul>
+    <div class="empty-state" data-filter-empty hidden>
+      <p class="empty-state__title">No memories match these filters</p>
+      <p class="empty-state__body">Try “View All”, or choose a different category or language.</p>
+    </div>
+    {%- else %}
+    {% include empty-state.html title="No memories published yet" body="The archive is built and waiting for the first contributions. Approved memories appear here with their own page." url="/contribute/" url_text="Contribute a Memory" %}
+    {%- endif %}
+
+    {% include notice.html variant="info" title="How memories are added" body="Members suggest a memory, it is checked for accuracy, consent and tone, and the maintainer commits it to the repository. See CONTENT_GUIDE.md in the repository for the exact front matter schema, and the Privacy Policy for how corrections and removals work." url="/contribute/" url_text="Read the contribution guide" %}
+  </div>
+</section>

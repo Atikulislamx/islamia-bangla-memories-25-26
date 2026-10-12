@@ -1,0 +1,37 @@
+{%- comment -%}
+Lightbox markup. Hidden until assets/js/main.js opens it from a gallery link.
+Focus is moved into the dialog on open and returned to the trigger on close;
+Escape closes, arrow keys move between images. The markup stays inert (and
+invisible) when JavaScript is unavailable, because the gallery links point at
+the full-size images anyway.
+{%- endcomment -%}
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden data-lightbox-root>
+  <div class="lightbox__backdrop" data-lightbox-close></div>
+  <div class="lightbox__panel">
+    <div class="lightbox__toolbar">
+      <p class="lightbox__counter" data-lightbox-counter aria-live="polite"></p>
+      <button class="lightbox__button lightbox__button--close" type="button" data-lightbox-close>
+        Close<span class="u-visually-hidden"> image viewer</span>
+      </button>
+    </div>
+    <figure class="lightbox__figure">
+      <!-- Placeholder 1×1 transparent pixel (inline data URI, no request): the
+           real src is set by assets/js/main.js when the viewer opens, and when
+           JavaScript is unavailable the viewer never opens. -->
+      <img class="lightbox__image"
+           data-lightbox-image
+           src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+           alt=""
+           decoding="async">
+      <figcaption class="lightbox__caption" data-lightbox-caption></figcaption>
+    </figure>
+    <div class="lightbox__navigation">
+      <button class="lightbox__button" type="button" data-lightbox-prev>
+        <span aria-hidden="true">←</span> Previous image
+      </button>
+      <button class="lightbox__button" type="button" data-lightbox-next>
+        Next image <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+</div>
