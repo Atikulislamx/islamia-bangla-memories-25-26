@@ -1,0 +1,71 @@
+backend:
+  name: turbo-github
+  turbo_site_id: "50710218-f620-46cd-8ee7-f56ff252e14d"
+  branch: main
+
+site_url: "https://atikulislamx.github.io/islamia-bangla-memories-25-26"
+display_url: "https://atikulislamx.github.io/islamia-bangla-memories-25-26"
+
+locale: "bn"
+
+media_folder: "assets/uploads"
+public_folder: "/islamia-bangla-memories-25-26/assets/uploads"
+
+collections:
+  - name: "events"
+    label: "ইভেন্ট ও অনুষ্ঠান"
+    folder: "_events"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "ইভেন্টের নাম", name: "title", widget: "string" }
+      - { label: "তারিখ", name: "date", widget: "datetime" }
+      - { label: "কভার ছবি", name: "cover", widget: "image", required: false }
+      - { label: "সংক্ষিপ্ত বিবরণ", name: "summary", widget: "text" }
+      - { label: "বিস্তারিত স্মৃতিচারণ", name: "body", widget: "markdown" }
+      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+
+  - name: "memories"
+    label: "স্মৃতিচারণ"
+    folder: "_memories"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "শিরোনাম", name: "title", widget: "string" }
+      - { label: "লেখক", name: "author", widget: "string" }
+      - { label: "স্মৃতিচারণ", name: "body", widget: "markdown" }
+      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+
+  - name: "quotes"
+    label: "শিক্ষার্থীদের উক্তি"
+    folder: "_quotes"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "উক্তি", name: "quote", widget: "text" }
+      - { label: "নাম", name: "author", widget: "string" }
+      - { label: "বিভাগ", name: "department", widget: "string", default: "বাংলা বিভাগ" }
+      - { label: "শিক্ষাবর্ষ", name: "batch", widget: "string", default: "২০২৫–২৬" }
+      - { label: "Facebook পোস্টের লিংক", name: "facebook_url", widget: "string", required: false }
+      - { label: "প্রকাশের অনুমতি নিশ্চিত", name: "permission_confirmed", widget: "boolean", default: false }
+      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
+
+  - name: "people"
+    label: "আমাদের শিক্ষার্থীরা"
+    folder: "_people"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "নাম", name: "name", widget: "string" }
+      - { label: "ছবি", name: "photo", widget: "image", required: false }
+      - { label: "পরিচিতি", name: "bio", widget: "text", required: false }
+      - { label: "প্রকাশের অনুমতি নিশ্চিত", name: "permission_confirmed", widget: "boolean", default: false }
+      - { label: "প্রকাশের অনুমোদন", name: "approved", widget: "boolean", default: false }
